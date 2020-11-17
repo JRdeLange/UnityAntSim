@@ -9,12 +9,24 @@ public class Ant : MonoBehaviour
     float speed = 3;
     Vector3 direction = Vector3.forward;
     float wiggleSpeed = 1;
-    float wiggleAngle = 90;
-    float newMovementAngle = 0;
+    float wiggleAngle = 45;
+    float newMovementAngle;
+
+    // Sense variables
+    float coneWidth = 90;
+    float coneRadius = 4;
+    float smallestToBeSensedObjectWidth = 1;
+    float coneRayInterval;
+
+    // Debug stuff
+    public LineRenderer lineRenderer;
 
     // Start is called before the first frame update
-    void Start()
+    protected virtual void Start()
     {
+        // Some math that makes sure that we are using the minimal amount of rays possible
+        // while not missing any objects larger than smallestToBeSensedObjectWidth
+        coneRayInterval = Mathf.Atan(smallestToBeSensedObjectWidth/coneRadius) * Mathf.Rad2Deg;
         
     }
 
@@ -36,12 +48,10 @@ public class Ant : MonoBehaviour
 
         // Rotate
         direction = Quaternion.Euler(0, directionRotation, 0) * direction;
+        direction.Normalize();
 
         // Update how far we still have to rotate
         newMovementAngle -= directionRotation;
-
-        print(newMovementAngle);
-
     }
 
     void Move()
@@ -50,9 +60,30 @@ public class Ant : MonoBehaviour
         transform.position += speed * direction * Time.deltaTime;
     }
 
+    void See()
+    {
+        List<Vector3> rayDirections = AntSenses.GenerateSenseRayDirections(coneWidth, coneRadius, coneRayInterval);
+
+        // Make the lines visible
+        
+        foreach (Vector3 ray in rayDirections){
+            // Rotate the rays to face the ant's direction
+            float directionAngle = Vector3.Angle(direction, Vector3.forward);
+            Vector3 rotatedRay = Quaternion.Euler(0, directionAngle, 0) * ray;
+            rotatedRay.Normalize();
+
+            // Makes the lines visible for debug purposes
+            if (true){
+                Debug.DrawLine(transform.position, transform.position + (rotatedRay * coneRadius), Color.white);
+            }
+        }
+        
+    }
+
     // Update is called once per frame
     protected virtual void Update()
     {
+        See();
         Move();
     }
 }
