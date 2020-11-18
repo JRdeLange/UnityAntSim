@@ -16,10 +16,6 @@ public class Ant : MonoBehaviour
     float coneWidth = 120;
     float coneRadius = 5;
     float smallestToBeSensedObjectWidth = 1;
-    float coneRayInterval;
-
-    // Debug stuff
-    public LineRenderer lineRenderer;
 
     // Start is called before the first frame update
     protected virtual void Start()
