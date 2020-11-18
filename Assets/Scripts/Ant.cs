@@ -24,10 +24,7 @@ public class Ant : MonoBehaviour
     // Start is called before the first frame update
     protected virtual void Start()
     {
-        // Some math that makes sure that we are using the minimal amount of rays possible
-        // while not missing any objects larger than smallestToBeSensedObjectWidth
-        coneRayInterval = Mathf.Atan(smallestToBeSensedObjectWidth/coneRadius) * Mathf.Rad2Deg;
-        
+        CalculateConeRayInterval();
     }
 
     // Wiggle by choosing a new direction and turning by wigglespeed towards that direction
@@ -61,18 +58,20 @@ public class Ant : MonoBehaviour
     }
 
     void CalculateConeRayInterval(){
-        // Delen door nul etc voorkomen
+        // Prevent division by zero
         if (coneRadius < 0.05f) coneRadius = 0.05f;
+        // Prevent an infinite amount of rays
         if (smallestToBeSensedObjectWidth < 0.05f) smallestToBeSensedObjectWidth = 0.05f;
+        // Some math that makes sure that we are using the minimal amount of rays possible
+        // while not missing any objects larger than smallestToBeSensedObjectWidth (TOA van soscastoa)
         coneRayInterval = Mathf.Atan(smallestToBeSensedObjectWidth/coneRadius) * Mathf.Rad2Deg;
     }
 
     void See()
     {
-        List<Vector3> rayDirections = AntSenses.GenerateSenseRayDirections(coneWidth, coneRadius, coneRayInterval);
+        List<Vector3> rayDirections = AntSenseMethods.GenerateSenseRayDirections(coneWidth, coneRadius, coneRayInterval);
 
-        // Make the lines visible
-        
+        // Loop over all the sight rays       
         foreach (Vector3 ray in rayDirections){
             // Rotate the rays to face the ant's direction
             float directionAngle = Vector3.SignedAngle(Vector3.forward, direction, Vector3.up);
@@ -80,9 +79,7 @@ public class Ant : MonoBehaviour
             rotatedRay.Normalize();
 
             // Makes the lines visible for debug purposes
-            if (true){
-                Debug.DrawLine(transform.position, transform.position + (rotatedRay * coneRadius), Color.white);
-            }
+            Debug.DrawLine(transform.position, transform.position + (rotatedRay * coneRadius), Color.white);
         }
         
     }
@@ -90,6 +87,7 @@ public class Ant : MonoBehaviour
     // Update is called once per frame
     protected virtual void Update()
     {
+        // Needed to be able to adjust the sight parameters during runtime
         CalculateConeRayInterval();
         
         See();
