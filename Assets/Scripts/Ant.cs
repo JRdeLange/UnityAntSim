@@ -13,9 +13,9 @@ public class Ant : MonoBehaviour
     float newMovementAngle;
 
     // Sense variables
-    public float coneWidth = 120;
-    public float coneRadius = 10;
-    public float smallestToBeSensedObjectWidth = 1;
+    float coneWidth = 120;
+    float coneRadius = 5;
+    float smallestToBeSensedObjectWidth = 1;
     float coneRayInterval;
 
     // Debug stuff
@@ -24,7 +24,7 @@ public class Ant : MonoBehaviour
     // Start is called before the first frame update
     protected virtual void Start()
     {
-        CalculateConeRayInterval();
+        
     }
 
     // Wiggle by choosing a new direction and turning by wigglespeed towards that direction
@@ -57,39 +57,16 @@ public class Ant : MonoBehaviour
         transform.position += speed * direction * Time.deltaTime;
     }
 
-    void CalculateConeRayInterval(){
-        // Prevent division by zero
-        if (coneRadius < 0.05f) coneRadius = 0.05f;
-        // Prevent an infinite amount of rays
-        if (smallestToBeSensedObjectWidth < 0.05f) smallestToBeSensedObjectWidth = 0.05f;
-        // Some math that makes sure that we are using the minimal amount of rays possible
-        // while not missing any objects larger than smallestToBeSensedObjectWidth (TOA van soscastoa)
-        coneRayInterval = Mathf.Atan(smallestToBeSensedObjectWidth/coneRadius) * Mathf.Rad2Deg;
-    }
-
     void See()
     {
-        List<Vector3> rayDirections = AntSenseMethods.GenerateSenseRayDirections(coneWidth, coneRadius, coneRayInterval);
-
-        // Loop over all the sight rays       
-        foreach (Vector3 ray in rayDirections){
-            // Rotate the rays to face the ant's direction
-            float directionAngle = Vector3.SignedAngle(Vector3.forward, direction, Vector3.up);
-            Vector3 rotatedRay = Quaternion.Euler(0, directionAngle, 0) * ray;
-            rotatedRay.Normalize();
-
-            // Makes the lines visible for debug purposes
-            Debug.DrawLine(transform.position, transform.position + (rotatedRay * coneRadius), Color.white);
-        }
-        
+        // List to put all of the objects in sight in
+        List<GameObject> objectsInSight = AntSenseMethods.GetObjectsInVision(transform, direction, coneWidth, 
+                                                                             coneRadius, smallestToBeSensedObjectWidth);
     }
 
     // Update is called once per frame
     protected virtual void Update()
-    {
-        // Needed to be able to adjust the sight parameters during runtime
-        CalculateConeRayInterval();
-        
+    {        
         See();
         Move();
     }
