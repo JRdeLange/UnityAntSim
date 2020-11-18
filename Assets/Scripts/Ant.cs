@@ -13,9 +13,9 @@ public class Ant : MonoBehaviour
     float newMovementAngle;
 
     // Sense variables
-    float coneWidth = 90;
-    float coneRadius = 4;
-    float smallestToBeSensedObjectWidth = 1;
+    public float coneWidth = 120;
+    public float coneRadius = 10;
+    public float smallestToBeSensedObjectWidth = 1;
     float coneRayInterval;
 
     // Debug stuff
@@ -60,6 +60,13 @@ public class Ant : MonoBehaviour
         transform.position += speed * direction * Time.deltaTime;
     }
 
+    void CalculateConeRayInterval(){
+        // Delen door nul etc voorkomen
+        if (coneRadius < 0.05f) coneRadius = 0.05f;
+        if (smallestToBeSensedObjectWidth < 0.05f) smallestToBeSensedObjectWidth = 0.05f;
+        coneRayInterval = Mathf.Atan(smallestToBeSensedObjectWidth/coneRadius) * Mathf.Rad2Deg;
+    }
+
     void See()
     {
         List<Vector3> rayDirections = AntSenses.GenerateSenseRayDirections(coneWidth, coneRadius, coneRayInterval);
@@ -68,7 +75,7 @@ public class Ant : MonoBehaviour
         
         foreach (Vector3 ray in rayDirections){
             // Rotate the rays to face the ant's direction
-            float directionAngle = Vector3.Angle(direction, Vector3.forward);
+            float directionAngle = Vector3.SignedAngle(Vector3.forward, direction, Vector3.up);
             Vector3 rotatedRay = Quaternion.Euler(0, directionAngle, 0) * ray;
             rotatedRay.Normalize();
 
@@ -83,6 +90,8 @@ public class Ant : MonoBehaviour
     // Update is called once per frame
     protected virtual void Update()
     {
+        CalculateConeRayInterval();
+        
         See();
         Move();
     }

@@ -29,11 +29,6 @@ public class AntSenses : MonoBehaviour
             rayDirections.Add(Quaternion.Euler(0, 0, 180) * lastDirection);
         }
 
-        foreach (var item in rayDirections)
-        {
-            print(item);
-        }
-
         return rayDirections;
     }
 }
