@@ -72,12 +72,9 @@ public class AntSenseMethods : MonoBehaviour
             }
 
             // Debug printing
-            /*
             foreach (var item in objectsInSight){
                 print(item);
             }
-            print("next frame");
-            */
         }
         
         return objectsInSight;

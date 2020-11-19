@@ -42,6 +42,7 @@ public class Ant : MonoBehaviour
         // Rotate
         direction = Quaternion.Euler(0, directionRotation, 0) * direction;
         direction.Normalize();
+        transform.Rotate(0, 0, directionRotation);
 
         // Update how far we still have to rotate
         newMovementAngle -= directionRotation;

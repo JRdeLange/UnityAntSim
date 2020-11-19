@@ -1,0 +1,5 @@
+- Collision between ants
+- Walls with Collision
+- Pheromone Manager
+- Food
+- Direction fixen?
