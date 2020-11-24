@@ -17,6 +17,8 @@ public class Ant : MonoBehaviour
     float coneRadius = 5;
     float smallestToBeSensedObjectWidth = 1;
 
+    List<GameObject> touchedObjects = new List<GameObject>();
+
     // Start is called before the first frame update
     protected virtual void Start()
     {
@@ -46,10 +48,9 @@ public class Ant : MonoBehaviour
         newMovementAngle -= directionRotation;
     }
 
-    void Move()
-    {
-        Wiggle();
-        transform.position += speed * transform.forward * Time.deltaTime;
+    void OnCollisionEnter(Collision other) {
+        touchedObjects.Add(other.gameObject);
+        print("hit something");
     }
 
     void See()
@@ -59,10 +60,29 @@ public class Ant : MonoBehaviour
                                                                              coneRadius, smallestToBeSensedObjectWidth);
     }
 
+    void Feel()
+    {
+        foreach (GameObject gameObject in touchedObjects){
+            print(gameObject);
+        }
+        print("nextFrame");
+    }
+
+    void Move()
+    {
+        Wiggle();
+        transform.position += speed * transform.forward * Time.deltaTime;
+    }
+
     // Update is called once per frame
     protected virtual void Update()
     {        
         See();
+        Feel();
         Move();
+
+        // Because all physics stuff (including onTriggerEnter) happens before
+        // update we can clear the list here to make it empty for the next frame
+        touchedObjects.Clear();
     }
 }
