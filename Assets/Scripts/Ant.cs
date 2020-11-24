@@ -40,9 +40,7 @@ public class Ant : MonoBehaviour
         }
 
         // Rotate
-        direction = Quaternion.Euler(0, directionRotation, 0) * direction;
-        direction.Normalize();
-        transform.Rotate(0, 0, directionRotation);
+        transform.Rotate(0, directionRotation, 0);
 
         // Update how far we still have to rotate
         newMovementAngle -= directionRotation;
@@ -51,13 +49,13 @@ public class Ant : MonoBehaviour
     void Move()
     {
         Wiggle();
-        transform.position += speed * direction * Time.deltaTime;
+        transform.position += speed * transform.forward * Time.deltaTime;
     }
 
     void See()
     {
         // List to put all of the objects in sight in
-        List<GameObject> objectsInSight = AntSenseMethods.GetObjectsInVision(transform, direction, coneWidth, 
+        List<GameObject> objectsInSight = AntSenseMethods.GetObjectsInVision(transform, transform.forward, coneWidth, 
                                                                              coneRadius, smallestToBeSensedObjectWidth);
     }
 

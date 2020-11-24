@@ -2,4 +2,7 @@
 - Walls with Collision
 - Pheromone Manager
 - Food
-- Direction fixen?
+
+
+DONE:
+- Direction fixen

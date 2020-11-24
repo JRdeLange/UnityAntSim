@@ -72,9 +72,9 @@ public class AntSenseMethods : MonoBehaviour
             }
 
             // Debug printing
-            foreach (var item in objectsInSight){
-                print(item);
-            }
+            //foreach (var item in objectsInSight){
+            //    print(item);
+            //}
         }
         
         return objectsInSight;
