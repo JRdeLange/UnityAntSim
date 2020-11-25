@@ -51,7 +51,6 @@ public class PheromoneManager : MonoBehaviour
     // Goes over each square to check if it has pheromones, and diffuses and evaporates the pheromones at these locations
     void SpreadAndEvaporatePheromones()
     {
-        print("chack");
         pheromoneTransferMap = new float[mapSizeX,mapSizeZ];
         for (int xPos = 0; xPos < mapSizeX; xPos++)
         {
@@ -78,8 +77,6 @@ public class PheromoneManager : MonoBehaviour
     {
 
     }
-
-
 
     //// Functions for interacting with the pheromone manager
     // Drop pheromones at location [xPos, zPos]
