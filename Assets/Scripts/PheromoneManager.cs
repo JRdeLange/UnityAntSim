@@ -21,25 +21,25 @@ public class PheromoneManager : MonoBehaviour
     void diffuseFromPos(int xPos, int zPos)
     {
         float concentration = pheromoneMap[xPos, zPos];
-        for (int x = xPos-1; x < xPos+1; x++)
+        for (int x = xPos - 1; x < xPos+1; x++)
         {
-            for (int z = zPos-1; z < zPos+1; z++)
+            for (int z = zPos - 1; z < zPos + 1; z++)
             {
                 if (x == zPos && z == zPos)
                 {
-                    pheromoneTransferMap[x,z] = pheromoneTransferMap[x,z] + concentration * (1f - 8 * diffuseFactor + evaporationFactor);
+                    pheromoneTransferMap[x, z] = pheromoneTransferMap[x, z] + concentration * (1f - 8 * diffuseFactor + evaporationFactor);
                 }else
                 {
-                    pheromoneTransferMap[x,z] = pheromoneMap[x,z] + concentration * diffuseFactor;
+                    pheromoneTransferMap[x, z] = pheromoneMap[x, z] + concentration * diffuseFactor;
                 }          
             }
         }
     }
 
     // Checks whether the square [xPos][zPos] has a pheromone level above a certain threshold. If it does return true, if it doesn't return false.
-    bool posHasPheromones(int xPos,int zPos)
+    bool posHasPheromones(int xPos, int zPos)
     {
-        if (pheromoneMap[xPos,zPos] > senseThreshold)
+        if (pheromoneMap[xPos, zPos] > senseThreshold)
         {
             return true;
         }else
@@ -51,7 +51,7 @@ public class PheromoneManager : MonoBehaviour
     // Goes over each square to check if it has pheromones, and diffuses and evaporates the pheromones at these locations
     void SpreadAndEvaporatePheromones()
     {
-        pheromoneTransferMap = new float[mapSizeX,mapSizeZ];
+        pheromoneTransferMap = new float[mapSizeX, mapSizeZ];
         for (int xPos = 0; xPos < mapSizeX; xPos++)
         {
             for (int zPos = 0; zPos < mapSizeZ; zPos++)
@@ -68,7 +68,7 @@ public class PheromoneManager : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        pheromoneMap = new float[mapSizeX,mapSizeZ];
+        pheromoneMap = new float[mapSizeX, mapSizeZ];
         InvokeRepeating("SpreadAndEvaporatePheromones", 0f, scanTimeInterval);
     }
 
