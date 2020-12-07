@@ -21,7 +21,7 @@ public class PheromoneManager : MonoBehaviour
     void diffuseFromPos(int xPos, int zPos)
     {
         float concentration = pheromoneMap[xPos, zPos];
-        for (int x = xPos - 1; x < xPos+1; x++)
+        for (int x = xPos - 1; x < xPos + 1; x++)
         {
             for (int z = zPos - 1; z < zPos + 1; z++)
             {
