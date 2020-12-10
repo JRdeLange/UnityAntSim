@@ -17,7 +17,7 @@ public class Ant : MonoBehaviour
     float coneRadius = 5;
     float smallestToBeSensedObjectWidth = 1;
 
-    List<GameObject> touchedObjects = new List<GameObject>();
+    List<Collision> newCollisionsThisFrame = new List<Collision>();
 
     // Start is called before the first frame update
     protected virtual void Start()
@@ -48,24 +48,17 @@ public class Ant : MonoBehaviour
         newMovementAngle -= directionRotation;
     }
 
-    void OnCollisionEnter(Collision other) {
-        touchedObjects.Add(other.gameObject);
-        print("hit something");
+    protected virtual void ParseSight(List<RaycastHit> objectsInSightRays){
+        print("This should not be called, the subclass should handle this");
     }
 
     void See()
     {
         // List to put all of the objects in sight in
-        List<GameObject> objectsInSight = AntSenseMethods.GetObjectsInVision(transform, transform.forward, coneWidth, 
+        List<RaycastHit> objectsInSightRays = AntSenseMethods.GetObjectsInVision(transform, transform.forward, coneWidth, 
                                                                              coneRadius, smallestToBeSensedObjectWidth);
-    }
-
-    void Feel()
-    {
-        foreach (GameObject gameObject in touchedObjects){
-            print(gameObject);
-        }
-        print("nextFrame");
+        
+        ParseSight(objectsInSightRays);
     }
 
     void Move()
@@ -76,13 +69,55 @@ public class Ant : MonoBehaviour
 
     // Update is called once per frame
     protected virtual void Update()
-    {        
+    {
         See();
-        Feel();
         Move();
-
-        // Because all physics stuff (including onTriggerEnter) happens before
-        // update we can clear the list here to make it empty for the next frame
-        touchedObjects.Clear();
     }
 }
+
+
+
+/** Methods below here are from failed attempts but they could prove useful in the future
+
+    void SteerAway()
+    {
+        // Find the most important collision (future example: walls are more important than ants)
+        // We simply take the first ant for now
+
+        // This bit is a bit jank but otherwise I run into complaints from the compiler
+        Collision collision = newCollisionsThisFrame[0];
+        bool foundOne = false;
+        foreach (Collision testCollision in newCollisionsThisFrame){
+            if (testCollision.gameObject.tag == "RedWorkerAnt"){
+                collision = testCollision;
+                foundOne = true;
+                break;
+            }
+        }
+        if (!foundOne) return;
+        
+        // Find the angle relative to our forward angle
+        Vector3 antToCollider = (collision.gameObject.transform.position - transform.position).normalized;
+        float angle = Vector3.Angle(transform.forward, antToCollider);
+        if (Vector3.Dot(antToCollider, transform.right) < 0){
+            //angle *= -1;
+        }
+        print(antToCollider * 2);
+        print(collision.gameObject);
+        Debug.DrawLine(transform.position, transform.position + antToCollider * 2);
+    }
+
+    void OnCollisionEnter(Collision other) {
+        newCollisionsThisFrame.Add(other);
+        print("hit something");
+    }
+
+    void Feel()
+    {
+        foreach (Collision collision in newCollisionsThisFrame){
+            print(collision);
+        }
+        print("nextFrame");
+    }
+
+**/

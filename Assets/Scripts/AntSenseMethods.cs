@@ -43,13 +43,13 @@ public class AntSenseMethods : MonoBehaviour
         return Mathf.Atan(smallestToBeSensedObjectWidth/coneRadius) * Mathf.Rad2Deg;
     }
 
-    public static List<GameObject> GetObjectsInVision(Transform antTransform, Vector3 antDirection, float coneWidth, 
+    public static List<RaycastHit> GetObjectsInVision(Transform antTransform, Vector3 antDirection, float coneWidth, 
                                                       float coneRadius, float smallestToBeSensedObjectWidth)
     {
         float coneRayInterval = CalculateConeRayInterval(coneWidth, coneRadius, smallestToBeSensedObjectWidth);
         List<Vector3> rayDirections = AntSenseMethods.GenerateSenseRayDirections(coneWidth, coneRadius, coneRayInterval);
         // List to put all of the objects in sight in
-        List<GameObject> objectsInSight = new List<GameObject>();
+        List<RaycastHit> objectsInSightRays = new List<RaycastHit>();
         // Loop over all the sight rays       
         foreach (Vector3 ray in rayDirections){
             // Rotate the rays to face the ant's direction
@@ -64,10 +64,14 @@ public class AntSenseMethods : MonoBehaviour
             RaycastHit[] hits;
             hits = Physics.RaycastAll(antTransform.position, rotatedRay, coneRadius);
             foreach (var hit in hits){
-                // If the seen Gameobject is not yet in the list
-                if (objectsInSight.IndexOf(hit.collider.gameObject) == -1){
+                // If the seen Gameobject is not yet in the list or if it is a shorter ray to one already in the list
+                int idx = objectsInSightRays.IndexOf(hit);
+                if (idx == -1){
                     // Add it
-                    objectsInSight.Add(hit.collider.gameObject);
+                    objectsInSightRays.Add(hit);
+                } else if (objectsInSightRays[idx].distance > hit.distance){
+                    // Add it
+                    objectsInSightRays.Add(hit);
                 }
             }
 
@@ -77,6 +81,6 @@ public class AntSenseMethods : MonoBehaviour
             //}
         }
         
-        return objectsInSight;
+        return objectsInSightRays;
     }
 }
