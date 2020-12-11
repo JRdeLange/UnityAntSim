@@ -73,16 +73,30 @@ public class Ant : MonoBehaviour
         transform.position += speed * transform.forward * Time.deltaTime;
     }
 
+    //Move towards a specifik direction
+    void MoveInDirection(float xDir, float zDir)
+    {
+
+    }
+
+    // Get the direction with the highest pheromone concentration and move towards it
+    void FollowPheromone()
+    {
+        // Get the direction with the highest concentration
+        float[] direction;
+        direction = pheromoneManager.GetDirectionHighestConcentration((int)Mathf.Round(transform.position.x), (int)Mathf.Round(transform.position.z));
+
+        // Move in that direction
+        MoveInDirection(direction[0], direction[1]);
+    }
+
     // Update is called once per frame
     protected virtual void Update()
     {
         See();
         Move();
-        pheromoneManager.debug();
     }
 }
-
-
 
 /** Methods below here are from failed attempts but they could prove useful in the future
 

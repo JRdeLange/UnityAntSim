@@ -92,13 +92,30 @@ public class PheromoneManager : MonoBehaviour
     }
 
     // Sense pheromone concentration of location [xPos, zPos]
-    public float sensePheromoneConcentration(int xPos, int zPos)
+    public float GetPheromoneConcentration(int xPos, int zPos)
     {
         return pheromoneMap[xPos, zPos];
     }
 
-    public void debug()
+    public float[] GetDirectionHighestConcentration(int xPos, int zPos)
     {
-    	print("connected");
+        float[] direction = new float[2];
+        float concentration;
+
+        concentration = 0;
+
+        for (int x = xPos - 1; x < xPos + 1; x++)
+        {
+            for (int z = zPos - 1; z < zPos + 1; z++)
+            {
+                if (pheromoneMap[x, z] > concentration)
+                {
+                    concentration = pheromoneMap[x, z];
+                    direction[0] = (x-xPos);
+                    direction[1] = (z-zPos);
+                }
+            }
+        }
+        return direction;
     }
 }
