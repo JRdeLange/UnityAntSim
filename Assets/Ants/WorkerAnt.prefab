@@ -46,6 +46,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a214c5a193e54c140a80cfc14acc93f4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  pheromoneManager: {fileID: 2230825282754997470, guid: a09c31dfb3c9f1f4a82882b1c9c965e8, type: 3}
 --- !u!135 &721415800702047550
 SphereCollider:
   m_ObjectHideFlags: 0

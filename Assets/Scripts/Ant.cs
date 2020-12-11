@@ -4,6 +4,9 @@ using UnityEngine;
 
 public class Ant : MonoBehaviour
 {
+	// Add Pheromone Manager
+	public PheromoneManager pheromoneManager;
+	
     // Movement variables
     float speed = 3;
     Vector3 direction = Vector3.forward;
@@ -75,6 +78,7 @@ public class Ant : MonoBehaviour
     {
         See();
         Move();
+        pheromoneManager.debug();
     }
 }
 

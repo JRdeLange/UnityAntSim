@@ -86,12 +86,19 @@ public class PheromoneManager : MonoBehaviour
     }
 
     // Sense if there are pheromones at location [xPos, zPos]
-    public bool sensePheromone(int xPos, int zPos){
+    public bool sensePheromone(int xPos, int zPos)
+    {
         return posHasPheromones(xPos, zPos);
     }
 
     // Sense pheromone concentration of location [xPos, zPos]
-    public float sensePheromoneConcentration(int xPos, int zPos){
+    public float sensePheromoneConcentration(int xPos, int zPos)
+    {
         return pheromoneMap[xPos, zPos];
+    }
+
+    public void debug()
+    {
+    	print("connected");
     }
 }
