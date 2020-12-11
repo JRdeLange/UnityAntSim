@@ -63,15 +63,22 @@ public class AntSenseMethods : MonoBehaviour
             // Get the objects in view by casting the rays
             RaycastHit[] hits;
             hits = Physics.RaycastAll(antTransform.position, rotatedRay, coneRadius);
+
+            List<GameObject> addedGameObjects = new List<GameObject>();
             foreach (var hit in hits){
                 // If the seen Gameobject is not yet in the list or if it is a shorter ray to one already in the list
-                int idx = objectsInSightRays.IndexOf(hit);
-                if (idx == -1){
+                
+                int gameObjectidx = addedGameObjects.IndexOf(hit.collider.gameObject);
+                if (gameObjectidx == -1){
                     // Add it
                     objectsInSightRays.Add(hit);
-                } else if (objectsInSightRays[idx].distance > hit.distance){
+                    addedGameObjects.Add(hit.collider.gameObject);
+                } else if (objectsInSightRays[gameObjectidx].distance > hit.distance){
                     // Add it
+                    objectsInSightRays.RemoveAt(gameObjectidx);
+                    addedGameObjects.RemoveAt(gameObjectidx);
                     objectsInSightRays.Add(hit);
+                    addedGameObjects.Add(hit.collider.gameObject);
                 }
             }
 
