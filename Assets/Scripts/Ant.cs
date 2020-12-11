@@ -10,9 +10,10 @@ public class Ant : MonoBehaviour
     // Movement variables
     float speed = 4;
     Vector3 direction = Vector3.forward;
-    float wiggleSpeed = 2;
-    float wiggleAngle = 15;
+    float wiggleSpeed = 360;
+    float wiggleAngle = 35;
     float newMovementAngle;
+    bool emergency = false;
     bool stopped = false;
 
     // Sense variables
@@ -34,13 +35,67 @@ public class Ant : MonoBehaviour
         
     }
 
-    protected void IntelligentSteerAway(RaycastHit hit)
+    // Cast rays in order to find a clear direction
+    Vector3 FindClearDirection(List<Vector3> possibleAngles, Vector3 rotationAngle)
     {
-        List<Vector3> possibleAngles = AntSenseMethods.GenerateRayDirections(ISAconeWidth, ISAconeRadius, ISAconeInterval);
+        LayerMask mask = LayerMask.GetMask("Barrier");
         foreach (Vector3 dir in possibleAngles)
         {
-            
+            float directionAngle = Vector3.SignedAngle(Vector3.forward, rotationAngle, Vector3.up);
+            Vector3 rotatedDir = Quaternion.Euler(0, directionAngle, 0) * dir;
+            rotatedDir.Normalize();
+            if (! Physics.Raycast(transform.position, rotatedDir, ISArayLength, mask))
+            {
+                return rotatedDir;
+            }
+            Debug.DrawLine(transform.position, transform.position + rotatedDir * ISArayLength, Color.gray);
         }
+        return Vector3.zero;
+    }
+
+    protected void IntelligentSteerAway(RaycastHit hit)
+    {
+        // Get all the possible angles
+        List<Vector3> possibleAngles = AntSenseMethods.GenerateRayDirections(ISAconeWidth, ISAconeRadius, ISAconeInterval);
+        // Find a clear one
+        // Start by finding the vector in a right angle with the ray we hit the object with
+        Vector3 antToHit = (hit.point - transform.position).normalized;
+        float worldAngle = Vector3.Angle(transform.forward, antToHit);
+        if (Vector3.Dot(antToHit, transform.right) > 0){
+            worldAngle *= -1;
+        }
+        Vector3 localRotationAngle = Vector3.forward;
+        if (worldAngle < 0) localRotationAngle = Quaternion.Euler(0,270,0) * antToHit;
+        if (worldAngle >= 0) localRotationAngle = Quaternion.Euler(0,90,0) * antToHit;
+        localRotationAngle.Normalize();
+        print(localRotationAngle);
+
+        Vector3 clearAngle = FindClearDirection(possibleAngles, localRotationAngle);
+
+        if (hit.distance < 1.0F){
+            transform.forward = clearAngle;
+        }
+
+        // If there is no clear angle, stop moving
+        if (clearAngle == Vector3.zero)
+        {
+            stopped = true;
+            return;
+        }
+        stopped = false;
+
+        float angle = Vector3.Angle(transform.forward, clearAngle);
+        if (Vector3.Dot(clearAngle, transform.right) < 0){
+            angle *= -1;
+        }
+
+        print(angle);
+        newMovementAngle = angle;
+        //transform.forward = clearAngle;
+
+        Debug.DrawLine(transform.position, transform.position + clearAngle * ISArayLength);
+        Debug.DrawLine(transform.position, hit.point, Color.red);
+
     }
 
     // Steers away from the hit object by 90 degrees in the direction we are heading
@@ -81,12 +136,13 @@ public class Ant : MonoBehaviour
 
         // The amount we need to turn this frame
         float directionRotation = 0;
+        float turnSpeed = wiggleSpeed * Time.deltaTime;
         if (newMovementAngle > 0)
         {
-            directionRotation = Mathf.Min(wiggleSpeed, newMovementAngle);
+            directionRotation = Mathf.Min(turnSpeed, newMovementAngle);
         } else 
         {
-            directionRotation = Mathf.Max(-wiggleSpeed, newMovementAngle);
+            directionRotation = Mathf.Max(-turnSpeed, newMovementAngle);
         }
 
         // Rotate

@@ -9,7 +9,7 @@ public class Worker : Ant
     List<string> avoid = new List<string>();
     List<string> flee = new List<string>();
     List<string> importanceOrder = new List<string>();
-    float avoidThreshold = 1.75f;
+    float avoidThreshold = 1.5f;
 
     // Start is called before the first frame update
     protected override void Start()
