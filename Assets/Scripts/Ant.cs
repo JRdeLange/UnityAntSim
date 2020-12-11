@@ -4,7 +4,6 @@ using UnityEngine;
 
 public class Ant : MonoBehaviour
 {
-
     // Movement variables
     float speed = 3;
     Vector3 direction = Vector3.forward;
@@ -29,15 +28,18 @@ public class Ant : MonoBehaviour
     // If the direction is achieved, simply choose a new direction.
     void Wiggle()
     {
-        if (newMovementAngle == 0){
+        if (newMovementAngle == 0)
+        {
             newMovementAngle = Random.Range(-wiggleAngle, wiggleAngle);
         }
 
         // The amount we need to turn this frame
         float directionRotation = 0;
-        if (newMovementAngle > 0){
+        if (newMovementAngle > 0)
+        {
             directionRotation = Mathf.Min(wiggleSpeed, newMovementAngle);
-        } else {
+        } else 
+        {
             directionRotation = Mathf.Max(-wiggleSpeed, newMovementAngle);
         }
 
@@ -48,7 +50,8 @@ public class Ant : MonoBehaviour
         newMovementAngle -= directionRotation;
     }
 
-    protected virtual void ParseSight(List<RaycastHit> objectsInSightRays){
+    protected virtual void ParseSight(List<RaycastHit> objectsInSightRays)
+    {
         print("This should not be called, the subclass should handle this");
     }
 

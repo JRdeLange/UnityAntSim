@@ -15,7 +15,8 @@ public class AntSenseMethods : MonoBehaviour
         Vector3 lastDirection = Vector3.forward;
         rayDirections.Add(lastDirection);
         // Add the rest
-        while (coneWidth > 0){
+        while (coneWidth > 0)
+        {
             // Calculate new ray direction
             lastDirection = Quaternion.Euler(0, Mathf.Min(coneWidth, coneRayInterval), 0) * lastDirection;
             lastDirection.Normalize();
@@ -50,8 +51,10 @@ public class AntSenseMethods : MonoBehaviour
         List<Vector3> rayDirections = AntSenseMethods.GenerateSenseRayDirections(coneWidth, coneRadius, coneRayInterval);
         // List to put all of the objects in sight in
         List<RaycastHit> objectsInSightRays = new List<RaycastHit>();
+        List<GameObject> addedGameObjects = new List<GameObject>();
         // Loop over all the sight rays       
-        foreach (Vector3 ray in rayDirections){
+        foreach (Vector3 ray in rayDirections)
+        {
             // Rotate the rays to face the ant's direction
             float directionAngle = Vector3.SignedAngle(Vector3.forward, antDirection, Vector3.up);
             Vector3 rotatedRay = Quaternion.Euler(0, directionAngle, 0) * ray;
@@ -64,16 +67,18 @@ public class AntSenseMethods : MonoBehaviour
             RaycastHit[] hits;
             hits = Physics.RaycastAll(antTransform.position, rotatedRay, coneRadius);
 
-            List<GameObject> addedGameObjects = new List<GameObject>();
-            foreach (var hit in hits){
+            foreach (var hit in hits)
+            {
                 // If the seen Gameobject is not yet in the list or if it is a shorter ray to one already in the list
-                
+
                 int gameObjectidx = addedGameObjects.IndexOf(hit.collider.gameObject);
-                if (gameObjectidx == -1){
+                if (gameObjectidx == -1)
+                {
                     // Add it
                     objectsInSightRays.Add(hit);
                     addedGameObjects.Add(hit.collider.gameObject);
-                } else if (objectsInSightRays[gameObjectidx].distance > hit.distance){
+                } else if (objectsInSightRays[gameObjectidx].distance > hit.distance)
+                {
                     // Add it
                     objectsInSightRays.RemoveAt(gameObjectidx);
                     addedGameObjects.RemoveAt(gameObjectidx);

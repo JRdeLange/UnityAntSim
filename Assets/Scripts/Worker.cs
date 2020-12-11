@@ -35,9 +35,12 @@ public class Worker : Ant
         RaycastHit mostImportantInView = new RaycastHit();
         mostImportantInView.distance = Mathf.Infinity;
         float mostImportantIdx = Mathf.Infinity;
-        foreach (RaycastHit hit in objectsInSightRays){
+        foreach (RaycastHit hit in objectsInSightRays)
+        {
             float currentImportanceIdx = importanceOrder.IndexOf(hit.collider.gameObject.tag);
-            if (currentImportanceIdx != -1 && currentImportanceIdx <= mostImportantIdx && hit.distance < mostImportantInView.distance){
+            if (currentImportanceIdx != -1 && (currentImportanceIdx < mostImportantIdx || 
+                (currentImportanceIdx == mostImportantIdx && hit.distance < mostImportantInView.distance)))
+            {
                 mostImportantInView = hit;
                 mostImportantIdx = currentImportanceIdx;
             }
@@ -56,11 +59,14 @@ public class Worker : Ant
 
         print(gameObject);
 
-        if (flee.Contains(gameObject.tag)){
+        if (flee.Contains(gameObject.tag))
+        {
             // Approach behavior
-        } else if (avoid.Contains(gameObject.tag)){
+        } else if (avoid.Contains(gameObject.tag))
+        {
             // Avoid behavior
-        } else if (approach.Contains(gameObject.tag)){
+        } else if (approach.Contains(gameObject.tag))
+        {
             // Flee behavior
         }
     }
