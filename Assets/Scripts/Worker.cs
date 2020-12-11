@@ -9,6 +9,7 @@ public class Worker : Ant
     List<string> avoid = new List<string>();
     List<string> flee = new List<string>();
     List<string> importanceOrder = new List<string>();
+    float avoidThreshold = 1.75f;
 
     // Start is called before the first frame update
     protected override void Start()
@@ -20,38 +21,21 @@ public class Worker : Ant
 
         // Avoid similar ants
         avoid.Add(this.tag);
+        avoid.Add("Barrier");
         
         // Flee from stuff 
-        flee.Add("enemy"); // Still placeholder, change to relevant stuff later
+        flee.Add("Enemy"); // Still placeholder, change to relevant stuff later
 
-        importanceOrder.Add("enemy");
+        importanceOrder.Add("Enemy");
+        importanceOrder.Add("Barrier");
         importanceOrder.Add(this.tag);
         importanceOrder.Add("Food");
 
     }
 
-    RaycastHit FindMostImportantObject(List<RaycastHit> objectsInSightRays)
-    {
-        RaycastHit mostImportantInView = new RaycastHit();
-        mostImportantInView.distance = Mathf.Infinity;
-        float mostImportantIdx = Mathf.Infinity;
-        foreach (RaycastHit hit in objectsInSightRays)
-        {
-            float currentImportanceIdx = importanceOrder.IndexOf(hit.collider.gameObject.tag);
-            if (currentImportanceIdx != -1 && (currentImportanceIdx < mostImportantIdx || 
-                (currentImportanceIdx == mostImportantIdx && hit.distance < mostImportantInView.distance)))
-            {
-                mostImportantInView = hit;
-                mostImportantIdx = currentImportanceIdx;
-            }
-        }
-
-        return mostImportantInView;
-    }
-
     protected override void ParseSight(List<RaycastHit> objectsInSightRays)
     {
-        RaycastHit ray = FindMostImportantObject(objectsInSightRays);
+        RaycastHit ray = FindMostImportantObject(objectsInSightRays, importanceOrder);
         // Check if a thing has been found
         if (ray.distance == Mathf.Infinity) return;
 
@@ -64,7 +48,10 @@ public class Worker : Ant
             // Approach behavior
         } else if (avoid.Contains(gameObject.tag))
         {
-            // Avoid behavior
+            if (ray.distance < avoidThreshold)
+            {
+                IntelligentSteerAway(ray);
+            }
         } else if (approach.Contains(gameObject.tag))
         {
             // Flee behavior

@@ -8,16 +8,23 @@ public class Ant : MonoBehaviour
 	public PheromoneManager pheromoneManager;
 	
     // Movement variables
-    float speed = 3;
+    float speed = 4;
     Vector3 direction = Vector3.forward;
-    float wiggleSpeed = 1;
-    float wiggleAngle = 45;
+    float wiggleSpeed = 2;
+    float wiggleAngle = 15;
     float newMovementAngle;
+    bool stopped = false;
 
     // Sense variables
     float coneWidth = 120;
     float coneRadius = 5;
     float smallestToBeSensedObjectWidth = 1;
+
+    // Intelligent steer away variables
+    float ISAconeWidth = 360;
+    float ISAconeRadius = 3;
+    float ISAconeInterval = 10;
+    float ISArayLength = 3;
 
     List<Collision> newCollisionsThisFrame = new List<Collision>();
 
@@ -25,6 +32,42 @@ public class Ant : MonoBehaviour
     protected virtual void Start()
     {
         
+    }
+
+    protected void IntelligentSteerAway(RaycastHit hit)
+    {
+        List<Vector3> possibleAngles = AntSenseMethods.GenerateRayDirections(ISAconeWidth, ISAconeRadius, ISAconeInterval);
+        foreach (Vector3 dir in possibleAngles)
+        {
+            
+        }
+    }
+
+    // Steers away from the hit object by 90 degrees in the direction we are heading
+    protected void SteerAway(RaycastHit hit)
+    {
+        // Find the angle relative to our forward angle
+        Vector3 antToHit = (hit.point - transform.position).normalized;
+        float angle = Vector3.Angle(transform.forward, antToHit);
+        if (Vector3.Dot(antToHit, transform.right) < 0){
+            angle *= -1;
+        }
+
+        //print(angle);
+        Vector3 newDir = Vector3.forward;
+        if (angle < 0) newDir = Quaternion.Euler(0,270,0) * antToHit;
+        if (angle >= 0) newDir = Quaternion.Euler(0,90,0) * antToHit;
+
+        //Vector3 newDir = Quaternion.Euler(0,90,0) * antToHit;
+        angle = Vector3.Angle(transform.forward, newDir);
+        if (Vector3.Dot(newDir, transform.right) > 0){
+            angle *= -1;
+        }
+
+        print(angle);
+        newMovementAngle = angle;
+
+        Debug.DrawLine(transform.position, hit.point);
     }
 
     // Wiggle by choosing a new direction and turning by wigglespeed towards that direction
@@ -53,6 +96,25 @@ public class Ant : MonoBehaviour
         newMovementAngle -= directionRotation;
     }
 
+    protected RaycastHit FindMostImportantObject(List<RaycastHit> objectsInSightRays, List<string> importanceOrder)
+    {
+        RaycastHit mostImportantInView = new RaycastHit();
+        mostImportantInView.distance = Mathf.Infinity;
+        float mostImportantIdx = Mathf.Infinity;
+        foreach (RaycastHit hit in objectsInSightRays)
+        {
+            float currentImportanceIdx = importanceOrder.IndexOf(hit.collider.gameObject.tag);
+            if (currentImportanceIdx != -1 && (currentImportanceIdx < mostImportantIdx || 
+                (currentImportanceIdx == mostImportantIdx && hit.distance < mostImportantInView.distance)))
+            {
+                mostImportantInView = hit;
+                mostImportantIdx = currentImportanceIdx;
+            }
+        }
+
+        return mostImportantInView;
+    }
+
     protected virtual void ParseSight(List<RaycastHit> objectsInSightRays)
     {
         print("This should not be called, the subclass should handle this");
@@ -69,6 +131,8 @@ public class Ant : MonoBehaviour
 
     void Move()
     {
+        if (stopped) return;
+
         Wiggle();
         transform.position += speed * transform.forward * Time.deltaTime;
     }
