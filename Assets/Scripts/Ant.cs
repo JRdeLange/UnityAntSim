@@ -11,28 +11,27 @@ public class Ant : MonoBehaviour
     float speed = 4;
     Vector3 direction = Vector3.forward;
     float wiggleSpeed = 360;
-    float wiggleAngle = 35;
+    float wiggleAngle = 20;
     float newMovementAngle;
-    bool emergency = false;
     bool stopped = false;
 
     // Sense variables
-    float coneWidth = 120;
-    float coneRadius = 5;
+    float coneWidth = 90;
+    float coneRadius = 2;
     float smallestToBeSensedObjectWidth = 1;
+    LayerMask mask;
 
     // Intelligent steer away variables
     float ISAconeWidth = 360;
-    float ISAconeRadius = 3;
-    float ISAconeInterval = 10;
-    float ISArayLength = 3;
+    float ISAconeRadius = 2f;
+    float ISAconeInterval = 30;
 
     List<Collision> newCollisionsThisFrame = new List<Collision>();
 
     // Start is called before the first frame update
     protected virtual void Start()
     {
-        
+        mask = LayerMask.GetMask("Barrier", "Ant");
     }
 
     // Cast rays in order to find a clear direction
@@ -44,19 +43,21 @@ public class Ant : MonoBehaviour
             float directionAngle = Vector3.SignedAngle(Vector3.forward, rotationAngle, Vector3.up);
             Vector3 rotatedDir = Quaternion.Euler(0, directionAngle, 0) * dir;
             rotatedDir.Normalize();
-            if (! Physics.Raycast(transform.position, rotatedDir, ISArayLength, mask))
+
+            if (! Physics.Raycast(transform.position, rotatedDir, ISAconeRadius, mask))
             {
                 return rotatedDir;
             }
-            Debug.DrawLine(transform.position, transform.position + rotatedDir * ISArayLength, Color.gray);
+            
+            //Debug.DrawLine(transform.position, transform.position + rotatedDir * ISAconeRadius, Color.gray);
         }
         return Vector3.zero;
     }
 
-    protected void IntelligentSteerAway(RaycastHit hit)
+    protected void IntelligentSteerAway(RaycastHit hit, bool cannotIntersect)
     {
         // Get all the possible angles
-        List<Vector3> possibleAngles = AntSenseMethods.GenerateRayDirections(ISAconeWidth, ISAconeRadius, ISAconeInterval);
+        List<Vector3> possibleAngles = AntSenseMethods.GenerateRayDirections(ISAconeWidth, ISAconeInterval);
         // Find a clear one
         // Start by finding the vector in a right angle with the ray we hit the object with
         Vector3 antToHit = (hit.point - transform.position).normalized;
@@ -68,14 +69,8 @@ public class Ant : MonoBehaviour
         if (worldAngle < 0) localRotationAngle = Quaternion.Euler(0,270,0) * antToHit;
         if (worldAngle >= 0) localRotationAngle = Quaternion.Euler(0,90,0) * antToHit;
         localRotationAngle.Normalize();
-        print(localRotationAngle);
 
         Vector3 clearAngle = FindClearDirection(possibleAngles, localRotationAngle);
-
-        if (hit.distance < 1.0F){
-            transform.forward = clearAngle;
-        }
-
         // If there is no clear angle, stop moving
         if (clearAngle == Vector3.zero)
         {
@@ -84,17 +79,20 @@ public class Ant : MonoBehaviour
         }
         stopped = false;
 
+        if (cannotIntersect && hit.distance < 1.0F){
+            transform.forward = clearAngle;
+        }
+
         float angle = Vector3.Angle(transform.forward, clearAngle);
         if (Vector3.Dot(clearAngle, transform.right) < 0){
             angle *= -1;
         }
 
-        print(angle);
         newMovementAngle = angle;
         //transform.forward = clearAngle;
 
-        Debug.DrawLine(transform.position, transform.position + clearAngle * ISArayLength);
-        Debug.DrawLine(transform.position, hit.point, Color.red);
+        //Debug.DrawLine(transform.position, transform.position + clearAngle * ISArayLength);
+        //Debug.DrawLine(transform.position, hit.point, Color.red);
 
     }
 
@@ -119,10 +117,9 @@ public class Ant : MonoBehaviour
             angle *= -1;
         }
 
-        print(angle);
         newMovementAngle = angle;
 
-        Debug.DrawLine(transform.position, hit.point);
+        //Debug.DrawLine(transform.position, hit.point);
     }
 
     // Wiggle by choosing a new direction and turning by wigglespeed towards that direction
@@ -152,15 +149,16 @@ public class Ant : MonoBehaviour
         newMovementAngle -= directionRotation;
     }
 
-    protected RaycastHit FindMostImportantObject(List<RaycastHit> objectsInSightRays, List<string> importanceOrder)
+    protected RaycastHit FindMostImportantObject(List<RaycastHit> objectsInSightRays, Dictionary<string, int> importanceOrder)
     {
         RaycastHit mostImportantInView = new RaycastHit();
         mostImportantInView.distance = Mathf.Infinity;
         float mostImportantIdx = Mathf.Infinity;
         foreach (RaycastHit hit in objectsInSightRays)
         {
-            float currentImportanceIdx = importanceOrder.IndexOf(hit.collider.gameObject.tag);
-            if (currentImportanceIdx != -1 && (currentImportanceIdx < mostImportantIdx || 
+            int currentImportanceIdx;
+            importanceOrder.TryGetValue(hit.collider.gameObject.tag, out currentImportanceIdx);
+            if (currentImportanceIdx != 0 && (currentImportanceIdx < mostImportantIdx || 
                 (currentImportanceIdx == mostImportantIdx && hit.distance < mostImportantInView.distance)))
             {
                 mostImportantInView = hit;
@@ -180,7 +178,7 @@ public class Ant : MonoBehaviour
     {
         // List to put all of the objects in sight in
         List<RaycastHit> objectsInSightRays = AntSenseMethods.GetObjectsInVision(transform, transform.forward, coneWidth, 
-                                                                             coneRadius, smallestToBeSensedObjectWidth);
+                                                                             coneRadius, smallestToBeSensedObjectWidth, mask);
         
         ParseSight(objectsInSightRays);
     }

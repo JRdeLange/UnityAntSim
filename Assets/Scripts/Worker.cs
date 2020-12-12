@@ -7,8 +7,11 @@ public class Worker : Ant
 
     List<string> approach = new List<string>();
     List<string> avoid = new List<string>();
+    List<string> cannotIntersect = new List<string>();
     List<string> flee = new List<string>();
-    List<string> importanceOrder = new List<string>();
+    //List<string[]> importanceOrder = new List<string[]>();
+    Dictionary<string, int> importanceOrder = new Dictionary<string, int>();
+    Dictionary<string, System.Action<RaycastHit>> functionMapping = new Dictionary<string, System.Action<RaycastHit>>();
     float avoidThreshold = 1.5f;
 
     // Start is called before the first frame update
@@ -21,41 +24,84 @@ public class Worker : Ant
 
         // Avoid similar ants
         avoid.Add(this.tag);
-        avoid.Add("Barrier");
+
+        // Make sure to not intersect barriers
+        cannotIntersect.Add("Barrier");
         
         // Flee from stuff 
         flee.Add("Enemy"); // Still placeholder, change to relevant stuff later
 
-        importanceOrder.Add("Enemy");
-        importanceOrder.Add("Barrier");
-        importanceOrder.Add(this.tag);
-        importanceOrder.Add("Food");
+        int currentImportance = 1;
+        importanceOrder.Add("Enemy", currentImportance);
+        importanceOrder.Add("Barrier", currentImportance);
+        currentImportance++;
+        importanceOrder.Add(this.tag, currentImportance);
+        currentImportance++;
+        importanceOrder.Add("Food", currentImportance);
+
+        functionMapping.Add("Barrier", CannotIntersectBehavior);
+        functionMapping.Add(this.tag, AvoidBehavior);
+
+    }
+
+    void AvoidBehavior(RaycastHit hit)
+    {
+            if (hit.distance < avoidThreshold)
+            {
+                IntelligentSteerAway(hit, false);
+            }
+    }
+
+    void ApproachBehavior(RaycastHit hit)
+    {
+
+    }
+
+    void CannotIntersectBehavior(RaycastHit hit)
+    {
+        if (hit.distance < avoidThreshold)
+            {
+                IntelligentSteerAway(hit, true);
+            }
+    }
+
+    void FleeBehavior(RaycastHit hit)
+    {
 
     }
 
     protected override void ParseSight(List<RaycastHit> objectsInSightRays)
     {
-        RaycastHit ray = FindMostImportantObject(objectsInSightRays, importanceOrder);
+        RaycastHit hit = FindMostImportantObject(objectsInSightRays, importanceOrder);
         // Check if a thing has been found
-        if (ray.distance == Mathf.Infinity) return;
+        if (hit.distance == Mathf.Infinity) return;
 
-        GameObject gameObject = ray.collider.gameObject;
+        GameObject gameObject = hit.collider.gameObject;
 
-        print(gameObject);
+        functionMapping[gameObject.tag].DynamicInvoke(hit);
 
+        /**
         if (flee.Contains(gameObject.tag))
         {
-            // Approach behavior
+            // Flee behavior
         } else if (avoid.Contains(gameObject.tag))
         {
             if (ray.distance < avoidThreshold)
             {
-                IntelligentSteerAway(ray);
+                IntelligentSteerAway(ray, false);
+            }
+        } else if (cannotIntersect.Contains(gameObject.tag))
+        {
+            if (ray.distance < avoidThreshold)
+            {
+                IntelligentSteerAway(ray, true);
             }
         } else if (approach.Contains(gameObject.tag))
         {
-            // Flee behavior
+            // Approach behavior
         }
+        **/
+
     }
 
     // Update is called once per frame

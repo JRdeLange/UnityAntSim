@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class AntSenseMethods : MonoBehaviour
 {
-    public static List<Vector3> GenerateRayDirections(float coneWidth, float coneRadius, float coneRayInterval)
+    public static List<Vector3> GenerateRayDirections(float coneWidth, float coneRayInterval)
     {
         // Divide cone width by 2 to make it a symmetrical problem
         coneWidth = coneWidth/2;
@@ -45,10 +45,11 @@ public class AntSenseMethods : MonoBehaviour
     }
 
     public static List<RaycastHit> GetObjectsInVision(Transform antTransform, Vector3 antDirection, float coneWidth, 
-                                                      float coneRadius, float smallestToBeSensedObjectWidth)
+                                                      float coneRadius, float smallestToBeSensedObjectWidth,
+                                                      LayerMask mask)
     {
         float coneRayInterval = CalculateConeRayInterval(coneWidth, coneRadius, smallestToBeSensedObjectWidth);
-        List<Vector3> rayDirections = AntSenseMethods.GenerateRayDirections(coneWidth, coneRadius, coneRayInterval);
+        List<Vector3> rayDirections = AntSenseMethods.GenerateRayDirections(coneWidth, coneRayInterval);
         // List to put all of the objects in sight in
         List<RaycastHit> objectsInSightRays = new List<RaycastHit>();
         List<GameObject> addedGameObjects = new List<GameObject>();
@@ -65,7 +66,7 @@ public class AntSenseMethods : MonoBehaviour
 
             // Get the objects in view by casting the rays
             RaycastHit[] hits;
-            hits = Physics.RaycastAll(antTransform.position, rotatedRay, coneRadius);
+            hits = Physics.RaycastAll(antTransform.position, rotatedRay, coneRadius, mask);
 
             foreach (var hit in hits)
             {
