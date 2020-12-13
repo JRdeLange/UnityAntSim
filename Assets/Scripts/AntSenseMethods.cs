@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class AntSenseMethods : MonoBehaviour
 {
+    
     public static List<Vector3> GenerateRayDirections(float coneWidth, float coneRayInterval)
     {
         // Divide cone width by 2 to make it a symmetrical problem

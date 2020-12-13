@@ -6,6 +6,7 @@ TagManager:
   tags:
   - RedWorkerAnt
   - Barrier
+  - Food
   layers:
   - Default
   - TransparentFX
@@ -18,7 +19,7 @@ TagManager:
   - Floor
   - Ant
   - Barrier
-  - 
+  - Food
   - 
   - 
   - 

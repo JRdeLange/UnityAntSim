@@ -8,7 +8,7 @@ public class Ant : MonoBehaviour
 	public PheromoneManager pheromoneManager;
 	
     // Movement variables
-    float speed = 4;
+    float speed = 5;
     Vector3 direction = Vector3.forward;
     float wiggleSpeed = 360;
     float wiggleAngle = 20;
@@ -16,8 +16,8 @@ public class Ant : MonoBehaviour
     bool stopped = false;
 
     // Sense variables
-    float coneWidth = 90;
-    float coneRadius = 2;
+    float coneWidth = 120;
+    float coneRadius = 3;
     float smallestToBeSensedObjectWidth = 1;
     LayerMask mask;
 
@@ -91,7 +91,7 @@ public class Ant : MonoBehaviour
         newMovementAngle = angle;
         //transform.forward = clearAngle;
 
-        //Debug.DrawLine(transform.position, transform.position + clearAngle * ISArayLength);
+        //Debug.DrawLine(transform.position, transform.position + clearAngle * ISAconeRadius);
         //Debug.DrawLine(transform.position, hit.point, Color.red);
 
     }
