@@ -14,7 +14,7 @@ public class PheromoneVizTile : MonoBehaviour
         tileMaterial = tile.GetComponent<Renderer>().material;
     }
 
-    void ChangeTransparancy(float newTransparancy)
+    public void ChangeTransparancy(float newTransparancy)
     {
         Color color = tileMaterial.color;
         color.a = newTransparancy;

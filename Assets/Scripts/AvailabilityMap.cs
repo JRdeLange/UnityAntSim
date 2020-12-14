@@ -15,8 +15,8 @@ public class AvailabilityMap : MonoBehaviour
     void Start()
     {
         // Get the floor dimensions
-        width = (int)floor.transform.lossyScale.x * 10;
-        height = (int)floor.transform.lossyScale.z * 10;
+        width = (int)Mathf.Round(floor.transform.lossyScale.x * 10f);
+        height = (int)Mathf.Round(floor.transform.lossyScale.z * 10f);
 
         // Check if the floor is fully covered by the map
         if((floor.transform.lossyScale.x * 10) % 1.0f != 0 || (floor.transform.lossyScale.z * 10) % 1.0f != 0)

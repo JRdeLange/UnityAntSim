@@ -37,7 +37,8 @@ public class Food : MonoBehaviour
         return Random.Range(0.0f, 1.0f) < respawnChance;
     }
 
-    public void PickUp(){
+    public void PickUp()
+    {
         Destroy(gameObject);
     }
 
@@ -86,13 +87,13 @@ public class Food : MonoBehaviour
                         // Corners
                         if (spawnFoodAtAllEightDirs)
                         {
-                            rayLengths.Add(squareRootOfTwo);
+                            rayLengths.Add(squareRootOfTwo+0.1f);
                             directions.Add(new Vector3(i, 0, j));
                         }
                     } else
                     {
                         // Non-corners
-                        rayLengths.Add(1);
+                        rayLengths.Add(1.1f);
                         directions.Add(new Vector3(i, 0, j));
                     }
                 }

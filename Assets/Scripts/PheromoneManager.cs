@@ -13,22 +13,40 @@ public class PheromoneManager : MonoBehaviour
     public PheromoneVizTile pheromoneVizTile;
     int mapSizeX = 50;
     int mapSizeZ = 50;
+    float pheromoneCap = 100;
     float scanTimeInterval = 1f;
     float senseThreshold = 0.01f;
     float evaporationFactor = 0.1f;
     float diffuseFactor = 0.1f;
     float [,] pheromoneMap;
     float [,] pheromoneTransferMap;
+    PheromoneVizTile [,] tileMap;
 
     // Start is called before the first frame update
     void Start()
     {
+        print("test1");
         // Get the floor dimensions
-        mapSizeZ = (int)floor.transform.lossyScale.z * 10;
-        mapSizeX = (int)floor.transform.lossyScale.x * 10;
+        mapSizeZ = (int)Mathf.Round(floor.transform.lossyScale.z * 10f);
+        mapSizeX = (int)Mathf.Round(floor.transform.lossyScale.x * 10f);
 
         pheromoneMap = new float[mapSizeX, mapSizeZ];
+        CreateTileMap(mapSizeX, mapSizeZ);
         InvokeRepeating("SpreadAndEvaporatePheromones", 0f, scanTimeInterval);
+    }
+
+    // Create a map and spawn all of the tiles for pheromone visibility
+    void CreateTileMap(int mapSizeX, int mapSizeZ)
+    {
+        tileMap = new PheromoneVizTile[mapSizeX, mapSizeZ];
+        for (int x = 0; x < mapSizeX; x++)
+        {
+            for (int z = 0; z < mapSizeZ; z++)
+            {
+                PheromoneVizTile tile = Instantiate(pheromoneVizTile, new Vector3 (x,0,z), Quaternion.identity);
+                tileMap[x,z] = tile;
+            }
+        }
     }
 
     // Evaporates the pheromone value at [xPos,zPos] and diffuse some of that to the 8 surrounding squares.
@@ -98,6 +116,7 @@ public class PheromoneManager : MonoBehaviour
         return pheromoneMap[xPos, zPos];
     }
 
+    // Returns the direction with the highest pheromone concentration
     public float[] GetDirectionHighestConcentration(int xPos, int zPos)
     {
         float[] direction = new float[2];
@@ -118,6 +137,18 @@ public class PheromoneManager : MonoBehaviour
             }
         }
         return direction;
+    }
+
+    // Functions used for visualising pheromones
+    void UpdateVisuals()
+    {
+        for (int x = 0; x < mapSizeX; x++)
+        {
+            for (int z = 0; z < mapSizeZ; z++)
+            {
+                tileMap[x, z].ChangeTransparancy(pheromoneMap[x, z]/pheromoneCap);
+            }
+        }
     }
 
     // Update is called once per frame
