@@ -13,11 +13,16 @@ public class Worker : Ant
     Dictionary<string, int> importanceOrder = new Dictionary<string, int>();
     Dictionary<string, System.Action<RaycastHit>> functionMapping = new Dictionary<string, System.Action<RaycastHit>>();
     float avoidThreshold = 1.5f;
+    float foodPickupThreshold = 1.0f;
+    int amountOfCarriedFood = 0;
+    float maxCarriedFood = Mathf.Infinity;
 
     // Start is called before the first frame update
     protected override void Start()
     {
         base.Start();
+
+        getObjectsInVisionMask = LayerMask.GetMask("Food", "Barrier", "Ant");
 
         // Approach food
         approach.Add("Food");
@@ -34,13 +39,15 @@ public class Worker : Ant
         int currentImportance = 1;
         importanceOrder.Add("Enemy", currentImportance);
         importanceOrder.Add("Barrier", currentImportance);
+        importanceOrder.Add("Food", currentImportance);
         currentImportance++;
         importanceOrder.Add(this.tag, currentImportance);
         currentImportance++;
-        importanceOrder.Add("Food", currentImportance);
+        
 
         functionMapping.Add("Barrier", CannotIntersectBehavior);
         functionMapping.Add(this.tag, AvoidBehavior);
+        functionMapping.Add("Food", ApproachBehavior);
 
     }
 
@@ -54,7 +61,8 @@ public class Worker : Ant
 
     void ApproachBehavior(RaycastHit hit)
     {
-
+        Vector3 antToHit = (hit.point - transform.position).normalized;
+        newMovementAngle = AntSenseMethods.VectorToDirectionAngle(transform, antToHit);
     }
 
     void CannotIntersectBehavior(RaycastHit hit)
@@ -70,37 +78,39 @@ public class Worker : Ant
 
     }
 
+    void PickUpFood(RaycastHit hit)
+    {
+        hit.collider.gameObject.GetComponent<Food>().PickUp();
+        amountOfCarriedFood++;
+    }
+
+    bool SpecialConditions(RaycastHit hit)
+    {
+        if (hit.collider.gameObject.tag == "Food" && hit.distance < foodPickupThreshold
+            && amountOfCarriedFood < maxCarriedFood)
+        {
+            PickUpFood(hit);
+            return true;
+        }
+        return false;
+    }
+
     protected override void ParseSight(List<RaycastHit> objectsInSightRays)
     {
         RaycastHit hit = FindMostImportantObject(objectsInSightRays, importanceOrder);
         // Check if a thing has been found
         if (hit.distance == Mathf.Infinity) return;
 
+        //Debug.DrawLine(transform.position, hit.point, Color.red);
+
         GameObject gameObject = hit.collider.gameObject;
 
-        functionMapping[gameObject.tag].DynamicInvoke(hit);
-
-        /**
-        if (flee.Contains(gameObject.tag))
+        if (!SpecialConditions(hit))
         {
-            // Flee behavior
-        } else if (avoid.Contains(gameObject.tag))
-        {
-            if (ray.distance < avoidThreshold)
-            {
-                IntelligentSteerAway(ray, false);
-            }
-        } else if (cannotIntersect.Contains(gameObject.tag))
-        {
-            if (ray.distance < avoidThreshold)
-            {
-                IntelligentSteerAway(ray, true);
-            }
-        } else if (approach.Contains(gameObject.tag))
-        {
-            // Approach behavior
+            functionMapping[gameObject.tag].DynamicInvoke(hit);
         }
-        **/
+
+        
 
     }
 

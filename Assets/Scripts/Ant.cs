@@ -12,14 +12,14 @@ public class Ant : MonoBehaviour
     Vector3 direction = Vector3.forward;
     float wiggleSpeed = 360;
     float wiggleAngle = 20;
-    float newMovementAngle;
+    protected float newMovementAngle;
     bool stopped = false;
 
     // Sense variables
     float coneWidth = 120;
-    float coneRadius = 3;
+    float coneRadius = 4;
     float smallestToBeSensedObjectWidth = 1;
-    LayerMask mask;
+    protected LayerMask getObjectsInVisionMask;
 
     // Intelligent steer away variables
     float ISAconeWidth = 360;
@@ -31,7 +31,7 @@ public class Ant : MonoBehaviour
     // Start is called before the first frame update
     protected virtual void Start()
     {
-        mask = LayerMask.GetMask("Barrier", "Ant");
+
     }
 
     // Cast rays in order to find a clear direction
@@ -48,7 +48,6 @@ public class Ant : MonoBehaviour
             {
                 return rotatedDir;
             }
-            
             //Debug.DrawLine(transform.position, transform.position + rotatedDir * ISAconeRadius, Color.gray);
         }
         return Vector3.zero;
@@ -83,43 +82,13 @@ public class Ant : MonoBehaviour
             transform.forward = clearAngle;
         }
 
-        float angle = Vector3.Angle(transform.forward, clearAngle);
-        if (Vector3.Dot(clearAngle, transform.right) < 0){
-            angle *= -1;
-        }
-
+        float angle = AntSenseMethods.VectorToDirectionAngle(transform, clearAngle);
         newMovementAngle = angle;
         //transform.forward = clearAngle;
 
         //Debug.DrawLine(transform.position, transform.position + clearAngle * ISAconeRadius);
         //Debug.DrawLine(transform.position, hit.point, Color.red);
 
-    }
-
-    // Steers away from the hit object by 90 degrees in the direction we are heading
-    protected void SteerAway(RaycastHit hit)
-    {
-        // Find the angle relative to our forward angle
-        Vector3 antToHit = (hit.point - transform.position).normalized;
-        float angle = Vector3.Angle(transform.forward, antToHit);
-        if (Vector3.Dot(antToHit, transform.right) < 0){
-            angle *= -1;
-        }
-
-        //print(angle);
-        Vector3 newDir = Vector3.forward;
-        if (angle < 0) newDir = Quaternion.Euler(0,270,0) * antToHit;
-        if (angle >= 0) newDir = Quaternion.Euler(0,90,0) * antToHit;
-
-        //Vector3 newDir = Quaternion.Euler(0,90,0) * antToHit;
-        angle = Vector3.Angle(transform.forward, newDir);
-        if (Vector3.Dot(newDir, transform.right) > 0){
-            angle *= -1;
-        }
-
-        newMovementAngle = angle;
-
-        //Debug.DrawLine(transform.position, hit.point);
     }
 
     // Wiggle by choosing a new direction and turning by wigglespeed towards that direction
@@ -178,7 +147,8 @@ public class Ant : MonoBehaviour
     {
         // List to put all of the objects in sight in
         List<RaycastHit> objectsInSightRays = AntSenseMethods.GetObjectsInVision(transform, transform.forward, coneWidth, 
-                                                                             coneRadius, smallestToBeSensedObjectWidth, mask);
+                                                                             coneRadius, smallestToBeSensedObjectWidth, 
+                                                                             getObjectsInVisionMask);
         
         ParseSight(objectsInSightRays);
     }
@@ -215,48 +185,3 @@ public class Ant : MonoBehaviour
         Move();
     }
 }
-
-/** Methods below here are from failed attempts but they could prove useful in the future
-
-    void SteerAway()
-    {
-        // Find the most important collision (future example: walls are more important than ants)
-        // We simply take the first ant for now
-
-        // This bit is a bit jank but otherwise I run into complaints from the compiler
-        Collision collision = newCollisionsThisFrame[0];
-        bool foundOne = false;
-        foreach (Collision testCollision in newCollisionsThisFrame){
-            if (testCollision.gameObject.tag == "RedWorkerAnt"){
-                collision = testCollision;
-                foundOne = true;
-                break;
-            }
-        }
-        if (!foundOne) return;
-        
-        // Find the angle relative to our forward angle
-        Vector3 antToCollider = (collision.gameObject.transform.position - transform.position).normalized;
-        float angle = Vector3.Angle(transform.forward, antToCollider);
-        if (Vector3.Dot(antToCollider, transform.right) < 0){
-            //angle *= -1;
-        }
-        print(antToCollider * 2);
-        print(collision.gameObject);
-        Debug.DrawLine(transform.position, transform.position + antToCollider * 2);
-    }
-
-    void OnCollisionEnter(Collision other) {
-        newCollisionsThisFrame.Add(other);
-        print("hit something");
-    }
-
-    void Feel()
-    {
-        foreach (Collision collision in newCollisionsThisFrame){
-            print(collision);
-        }
-        print("nextFrame");
-    }
-
-**/

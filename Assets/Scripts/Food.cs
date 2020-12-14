@@ -37,6 +37,10 @@ public class Food : MonoBehaviour
         return Random.Range(0.0f, 1.0f) < respawnChance;
     }
 
+    public void PickUp(){
+        Destroy(gameObject);
+    }
+
     // Finds a free square if there is one around the food
     Vector3 FindFreeSquare()
     {

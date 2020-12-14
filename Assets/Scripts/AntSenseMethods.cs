@@ -4,6 +4,13 @@ using UnityEngine;
 
 public class AntSenseMethods : MonoBehaviour
 {
+    public static float VectorToDirectionAngle(Transform transform, Vector3 newDirection){
+        float angle = Vector3.Angle(transform.forward, newDirection);
+        if (Vector3.Dot(newDirection, transform.right) < 0){
+            angle *= -1;
+        }
+        return angle;
+    }
     
     public static List<Vector3> GenerateRayDirections(float coneWidth, float coneRayInterval)
     {
@@ -63,16 +70,16 @@ public class AntSenseMethods : MonoBehaviour
             rotatedRay.Normalize();
 
             // Makes the lines visible for debug purposes
-            // Debug.DrawLine(antTransform.position, antTransform.position + (rotatedRay * coneRadius), Color.white);
+            //Debug.DrawLine(antTransform.position, antTransform.position + (rotatedRay * coneRadius), Color.gray);
 
             // Get the objects in view by casting the rays
-            RaycastHit[] hits;
-            hits = Physics.RaycastAll(antTransform.position, rotatedRay, coneRadius, mask);
-
-            foreach (var hit in hits)
+            //RaycastHit[] hits;
+            //hits = Physics.RaycastAll(antTransform.position, rotatedRay, coneRadius, mask);
+            //foreach (var hit in hits)
+            RaycastHit hit;
+            if (Physics.Raycast(antTransform.position, rotatedRay, out hit, coneRadius, mask))
             {
                 // If the seen Gameobject is not yet in the list or if it is a shorter ray to one already in the list
-
                 int gameObjectidx = addedGameObjects.IndexOf(hit.collider.gameObject);
                 if (gameObjectidx == -1)
                 {
@@ -87,6 +94,7 @@ public class AntSenseMethods : MonoBehaviour
                     objectsInSightRays.Add(hit);
                     addedGameObjects.Add(hit.collider.gameObject);
                 }
+                //Debug.DrawLine(antTransform.position, hit.point);
             }
 
             // Debug printing
