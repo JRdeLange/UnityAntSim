@@ -82,7 +82,7 @@ public class Worker : Ant
     {
         hit.collider.gameObject.GetComponent<Food>().PickUp();
         amountOfCarriedFood++;
-        pheromoneManager.dropPheromone((int)Mathf.Round(transform.position.x), (int)Mathf.Round(transform.position.z), 100);
+        pheromoneManager.GetComponent<PheromoneManager>().dropPheromone((int)Mathf.Round(transform.position.x), (int)Mathf.Round(transform.position.z), 100f);
     }
 
     bool SpecialConditions(RaycastHit hit)

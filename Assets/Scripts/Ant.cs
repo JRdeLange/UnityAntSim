@@ -5,7 +5,7 @@ using UnityEngine;
 public class Ant : MonoBehaviour
 {
 	// Add Pheromone Manager
-	public PheromoneManager pheromoneManager;
+	public GameObject pheromoneManager;
 	
     // Movement variables
     float speed = 5;
@@ -31,7 +31,7 @@ public class Ant : MonoBehaviour
     // Start is called before the first frame update
     protected virtual void Start()
     {
-
+        pheromoneManager = GameObject.FindGameObjectWithTag("PheromoneManager");
     }
 
     // Cast rays in order to find a clear direction
@@ -172,7 +172,7 @@ public class Ant : MonoBehaviour
     {
         // Get the direction with the highest concentration
         float[] direction;
-        direction = pheromoneManager.GetDirectionHighestConcentration((int)Mathf.Round(transform.position.x), (int)Mathf.Round(transform.position.z));
+        direction = pheromoneManager.GetComponent<PheromoneManager>().GetDirectionHighestConcentration((int)Mathf.Round(transform.position.x), (int)Mathf.Round(transform.position.z));
 
         // Move in that direction
         MoveInDirection(direction[0], direction[1]);

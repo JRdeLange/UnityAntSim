@@ -14,10 +14,10 @@ public class PheromoneManager : MonoBehaviour
     int mapSizeX = 50;
     int mapSizeZ = 50;
     float pheromoneCap = 100;
-    float scanTimeInterval = 1f;
-    float senseThreshold = 0.01f;
-    float evaporationFactor = 0.1f;
-    float diffuseFactor = 0.1f;
+    float scanTimeInterval = 5f;
+    float senseThreshold = .01f;
+    float evaporationFactor = .1f;
+    float diffuseFactor = .1f;
     float [,] pheromoneMap;
     float [,] pheromoneTransferMap;
     PheromoneVizTile [,] tileMap;
@@ -25,7 +25,6 @@ public class PheromoneManager : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        print("test1");
         // Get the floor dimensions
         mapSizeZ = (int)Mathf.Round(floor.transform.lossyScale.z * 10f);
         mapSizeX = (int)Mathf.Round(floor.transform.lossyScale.x * 10f);
@@ -35,31 +34,36 @@ public class PheromoneManager : MonoBehaviour
         InvokeRepeating("SpreadAndEvaporatePheromones", 0f, scanTimeInterval);
     }
 
-    // Create a map and spawn all of the tiles for pheromone visibility
-    void CreateTileMap(int mapSizeX, int mapSizeZ)
+    // Goes over each square to check if it has pheromones, and diffuses and evaporates the pheromones at these locations
+    void SpreadAndEvaporatePheromones()
     {
-        tileMap = new PheromoneVizTile[mapSizeX, mapSizeZ];
-        for (int x = 0; x < mapSizeX; x++)
+        pheromoneTransferMap = new float[mapSizeX, mapSizeZ];
+        for (int xPos = 0; xPos < mapSizeX; xPos++)
         {
-            for (int z = 0; z < mapSizeZ; z++)
+            for (int zPos = 0; zPos < mapSizeZ; zPos++)
             {
-                PheromoneVizTile tile = Instantiate(pheromoneVizTile, new Vector3 (x,0,z), Quaternion.identity);
-                tileMap[x,z] = tile;
+                if (posHasPheromones(xPos, zPos))
+                {
+                    diffuseFromPos(xPos, zPos);
+                }
             }
         }
+        pheromoneMap = pheromoneTransferMap;
+        UpdateVisuals();
     }
 
     // Evaporates the pheromone value at [xPos,zPos] and diffuse some of that to the 8 surrounding squares.
     void diffuseFromPos(int xPos, int zPos)
     {
         float concentration = pheromoneMap[xPos, zPos];
-        for (int x = xPos - 1; x < xPos + 1; x++)
+        for (int x = xPos - 1; x <= xPos + 1; x++)
         {
-            for (int z = zPos - 1; z < zPos + 1; z++)
+            for (int z = zPos - 1; z <= zPos + 1; z++)
             {
-                if (x == zPos && z == zPos)
+                if (z > mapSizeZ || x > mapSizeX || z < 0 || x < 0){}
+                else if (x == xPos && z == zPos)
                 {
-                    pheromoneTransferMap[x, z] = pheromoneTransferMap[x, z] + concentration * (1f - 8 * diffuseFactor + evaporationFactor);
+                    pheromoneTransferMap[x, z] = pheromoneTransferMap[x, z] + concentration * (1f - ((8 * diffuseFactor) + evaporationFactor));
                 }else
                 {
                     pheromoneTransferMap[x, z] = pheromoneMap[x, z] + concentration * diffuseFactor;
@@ -80,28 +84,12 @@ public class PheromoneManager : MonoBehaviour
         }
     }
 
-    // Goes over each square to check if it has pheromones, and diffuses and evaporates the pheromones at these locations
-    void SpreadAndEvaporatePheromones()
-    {
-        pheromoneTransferMap = new float[mapSizeX, mapSizeZ];
-        for (int xPos = 0; xPos < mapSizeX; xPos++)
-        {
-            for (int zPos = 0; zPos < mapSizeZ; zPos++)
-            {
-                if (posHasPheromones(xPos, zPos))
-                {
-                    diffuseFromPos(xPos, zPos);
-                }
-            }
-        }
-        pheromoneMap = pheromoneTransferMap;
-    }
-
     //// Functions for interacting with the pheromone manager
     // Drop pheromones at location [xPos, zPos]
     public void dropPheromone(int xPos, int zPos, float concentration)
     {
-        pheromoneMap[xPos, zPos] = pheromoneMap[xPos, zPos] + concentration;
+        pheromoneMap[xPos, zPos] += concentration;
+        UpdateVisuals();
     }
 
     // Sense if there are pheromones at location [xPos, zPos]
@@ -146,7 +134,27 @@ public class PheromoneManager : MonoBehaviour
         {
             for (int z = 0; z < mapSizeZ; z++)
             {
-                tileMap[x, z].ChangeTransparancy(pheromoneMap[x, z]/pheromoneCap);
+                if (pheromoneMap[x, z] < pheromoneCap)
+                {
+                    tileMap[x, z].ChangeTransparancy(pheromoneMap[x, z]/pheromoneCap);
+                }else
+                {
+                    tileMap[x, z].ChangeTransparancy(1);
+                }              
+            }
+        }
+    }
+
+    // Create a map and spawn all of the tiles for pheromone visibility
+    void CreateTileMap(int mapSizeX, int mapSizeZ)
+    {
+        tileMap = new PheromoneVizTile[mapSizeX, mapSizeZ];
+        for (int x = 0; x < mapSizeX; x++)
+        {
+            for (int z = 0; z < mapSizeZ; z++)
+            {
+                PheromoneVizTile tile = Instantiate(pheromoneVizTile, new Vector3 (x+0.5f,0,z+0.5f), Quaternion.identity);
+                tileMap[x,z] = tile;
             }
         }
     }
