@@ -11,10 +11,10 @@ public class PheromoneManager : MonoBehaviour
     public AvailabilityMap AM;
     public Floor floor;
     public PheromoneVizTile pheromoneVizTile;
-    int mapSizeX = 50;
-    int mapSizeZ = 50;
+    int mapSizeX;
+    int mapSizeZ;
     float pheromoneCap = 100;
-    float scanTimeInterval = 5f;
+    float scanTimeInterval = 1f;
     float senseThreshold = .01f;
     float evaporationFactor = .1f;
     float diffuseFactor = .1f;
@@ -60,7 +60,7 @@ public class PheromoneManager : MonoBehaviour
         {
             for (int z = zPos - 1; z <= zPos + 1; z++)
             {
-                if (z > mapSizeZ || x > mapSizeX || z < 0 || x < 0){}
+                if (z >= mapSizeZ || x >= mapSizeX || z < 0 || x < 0){}
                 else if (x == xPos && z == zPos)
                 {
                     pheromoneTransferMap[x, z] = pheromoneTransferMap[x, z] + concentration * (1f - ((8 * diffuseFactor) + evaporationFactor));
@@ -89,7 +89,6 @@ public class PheromoneManager : MonoBehaviour
     public void dropPheromone(int xPos, int zPos, float concentration)
     {
         pheromoneMap[xPos, zPos] += concentration;
-        UpdateVisuals();
     }
 
     // Sense if there are pheromones at location [xPos, zPos]
