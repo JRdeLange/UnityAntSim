@@ -8,14 +8,28 @@ using UnityEngine;
 
 public class PheromoneManager : MonoBehaviour
 {
+    public AvailabilityMap AM;
+    public Floor floor;
+    public PheromoneVizTile pheromoneVizTile;
     int mapSizeX = 50;
     int mapSizeZ = 50;
     float scanTimeInterval = 1f;
     float senseThreshold = 0.01f;
     float evaporationFactor = 0.1f;
     float diffuseFactor = 0.1f;
-    float [,] pheromoneMap; 
+    float [,] pheromoneMap;
     float [,] pheromoneTransferMap;
+
+    // Start is called before the first frame update
+    void Start()
+    {
+        // Get the floor dimensions
+        mapSizeZ = (int)floor.transform.lossyScale.z * 10;
+        mapSizeX = (int)floor.transform.lossyScale.x * 10;
+
+        pheromoneMap = new float[mapSizeX, mapSizeZ];
+        InvokeRepeating("SpreadAndEvaporatePheromones", 0f, scanTimeInterval);
+    }
 
     // Evaporates the pheromone value at [xPos,zPos] and diffuse some of that to the 8 surrounding squares.
     void diffuseFromPos(int xPos, int zPos)
@@ -65,19 +79,6 @@ public class PheromoneManager : MonoBehaviour
         pheromoneMap = pheromoneTransferMap;
     }
 
-    // Start is called before the first frame update
-    void Start()
-    {
-        pheromoneMap = new float[mapSizeX, mapSizeZ];
-        InvokeRepeating("SpreadAndEvaporatePheromones", 0f, scanTimeInterval);
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-
-    }
-
     //// Functions for interacting with the pheromone manager
     // Drop pheromones at location [xPos, zPos]
     public void dropPheromone(int xPos, int zPos, float concentration)
@@ -117,5 +118,11 @@ public class PheromoneManager : MonoBehaviour
             }
         }
         return direction;
+    }
+
+    // Update is called once per frame
+    void Update()
+    {
+
     }
 }

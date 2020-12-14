@@ -1,6 +1,6 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
---- !u!1 &2230825282754997465
+--- !u!1 &3467656990504999621
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -8,39 +8,40 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 2230825282754997471}
-  - component: {fileID: 2230825282754997470}
+  - component: {fileID: 6220862571249422794}
+  - component: {fileID: 5131356751628104342}
   m_Layer: 0
-  m_Name: PheromoneManager
+  m_Name: AvailabilityMap
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!4 &2230825282754997471
+--- !u!4 &6220862571249422794
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2230825282754997465}
+  m_GameObject: {fileID: 3467656990504999621}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: 24.365784, y: 0.085178375, z: 23.701033}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &2230825282754997470
+--- !u!114 &5131356751628104342
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2230825282754997465}
+  m_GameObject: {fileID: 3467656990504999621}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 5be3dcbe9799c524c800f4dd86d31167, type: 3}
+  m_Script: {fileID: 11500000, guid: 1b7b517b105655244a45b075d82ae84e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  AM: {fileID: 0}
+  floor: {fileID: 3625900715127009921, guid: 26ce310e871b25347ae868e77e3e471b, type: 3}
+  Barrier: {fileID: 8884671400382562005, guid: b48e627e91d42f749bc74975143e31c6, type: 3}
