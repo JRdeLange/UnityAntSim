@@ -11,7 +11,7 @@ public class Worker : Ant
     List<string> flee = new List<string>();
     //List<string[]> importanceOrder = new List<string[]>();
     Dictionary<string, int> importanceOrder = new Dictionary<string, int>();
-    Dictionary<string, System.Action<RaycastHit>> functionMapping = new Dictionary<string, System.Action<RaycastHit>>();
+    Dictionary<string, System.Func<RaycastHit, bool>> functionMapping = new Dictionary<string, System.Func<RaycastHit, bool>>();
     float avoidThreshold = 1.5f;
     float foodPickupThreshold = 1.0f;
     int amountOfCarriedFood = 0;
@@ -51,38 +51,44 @@ public class Worker : Ant
 
     }
 
-    void AvoidBehavior(RaycastHit hit)
+    bool AvoidBehavior(RaycastHit hit)
     {
-            if (hit.distance < avoidThreshold)
-            {
-                IntelligentSteerAway(hit, false);
-            }
+        if (hit.distance < avoidThreshold)
+        {
+            IntelligentSteerAway(hit, false);
+            return true;
+        }
+        return false;
     }
 
-    void ApproachBehavior(RaycastHit hit)
+    bool ApproachBehavior(RaycastHit hit)
     {
         Vector3 antToHit = (hit.point - transform.position).normalized;
         newMovementAngle = AntSenseMethods.VectorToDirectionAngle(transform, antToHit);
+        return true;
     }
 
-    void CannotIntersectBehavior(RaycastHit hit)
+    bool CannotIntersectBehavior(RaycastHit hit)
     {
         if (hit.distance < avoidThreshold)
             {
                 IntelligentSteerAway(hit, true);
+                return true;
             }
+        return false;
     }
 
-    void FleeBehavior(RaycastHit hit)
+    bool FleeBehavior(RaycastHit hit)
     {
-
+        return true;
     }
 
-    void PickUpFood(RaycastHit hit)
+    bool PickUpFood(RaycastHit hit)
     {
         hit.collider.gameObject.GetComponent<Food>().PickUp();
         amountOfCarriedFood++;
-        pheromoneManager.GetComponent<PheromoneManager>().dropPheromone((int)Mathf.Round(transform.position.x), (int)Mathf.Round(transform.position.z), 100f);
+        pheromoneManager.dropPheromone((int)(transform.position.x), (int)(transform.position.z), 100f);
+        return true;
     }
 
     bool SpecialConditions(RaycastHit hit)
@@ -106,9 +112,12 @@ public class Worker : Ant
 
         GameObject gameObject = hit.collider.gameObject;
 
-        if (!SpecialConditions(hit))
+        if (! SpecialConditions(hit))
         {
-            functionMapping[gameObject.tag].DynamicInvoke(hit);
+            if (! (bool)functionMapping[gameObject.tag].DynamicInvoke(hit))
+            {
+                FollowPheromone();
+            }
         }
 
         

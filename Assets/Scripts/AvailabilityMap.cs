@@ -30,13 +30,19 @@ public class AvailabilityMap : MonoBehaviour
         ComputeAvailabilityMap();
     }
 
-    bool TraceRay(int x, int z)
+    bool TraceRays(int x, int z)
     {
         // Make the ray originate from the center of a square
-        Vector3 origin = new Vector3(x + 0.5f, 1, z + 0.5f);
+        Vector3 origin1 = new Vector3(x + 0.25f, 1, z + 0.25f);
+        Vector3 origin2 = new Vector3(x + 0.25f, 1, z + 0.75f);
+        Vector3 origin3 = new Vector3(x + 0.75f, 1, z + 0.25f);
+        Vector3 origin4 = new Vector3(x + 0.75f, 1, z + 0.75f);
 
         // If there is no hit encountered there is no barrier there
-        return (! Physics.Raycast(origin, Vector3.down, 1, mask));
+        return ! (Physics.Raycast(origin1, Vector3.down, 1, mask) ||
+                Physics.Raycast(origin2, Vector3.down, 1, mask) ||
+                Physics.Raycast(origin3, Vector3.down, 1, mask) ||
+                Physics.Raycast(origin4, Vector3.down, 1, mask));
     }
 
     void ComputeAvailabilityMap()
@@ -48,7 +54,7 @@ public class AvailabilityMap : MonoBehaviour
         {
             for (int y = 0; y < height; y++)
             {
-                map[x,y] = TraceRay(x, y);
+                map[x,y] = TraceRays(x, y);
             }
         }
     }

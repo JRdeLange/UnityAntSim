@@ -43,6 +43,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5be3dcbe9799c524c800f4dd86d31167, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  vizPlanePrefab: {fileID: 5108110672178691837, guid: b2c9bae834f143146b9547ea6fc6725e, type: 3}
   AM: {fileID: 0}
   floor: {fileID: 0}
   pheromoneVizTile: {fileID: 6092780707615846116, guid: 789e3172d16710a49834b9678a183f33, type: 3}

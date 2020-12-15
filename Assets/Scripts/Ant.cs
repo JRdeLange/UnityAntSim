@@ -5,7 +5,7 @@ using UnityEngine;
 public class Ant : MonoBehaviour
 {
 	// Add Pheromone Manager
-	public GameObject pheromoneManager;
+	protected PheromoneManager pheromoneManager;
 	
     // Movement variables
     float speed = 5;
@@ -31,7 +31,7 @@ public class Ant : MonoBehaviour
     // Start is called before the first frame update
     protected virtual void Start()
     {
-        pheromoneManager = GameObject.FindGameObjectWithTag("PheromoneManager");
+        pheromoneManager = GameObject.FindGameObjectWithTag("PheromoneManager").GetComponent<PheromoneManager>();
     }
 
     // Cast rays in order to find a clear direction
@@ -51,6 +51,19 @@ public class Ant : MonoBehaviour
             //Debug.DrawLine(transform.position, transform.position + rotatedDir * ISAconeRadius, Color.gray);
         }
         return Vector3.zero;
+    }
+
+    // Get the direction with the highest pheromone concentration and set the current movement angle towards it
+    protected void FollowPheromone()
+    {
+        // Get the direction with the highest concentration
+        float[] direction;
+        direction = pheromoneManager.GetDirectionHighestConcentration((int)(transform.position.x), (int)(transform.position.z));
+        Vector3 directionVector = new Vector3(direction[0], 0, direction[1]);
+
+        // Move in that direction
+        float angle = AntSenseMethods.VectorToDirectionAngle(transform, directionVector);
+        newMovementAngle = angle;
     }
 
     protected void IntelligentSteerAway(RaycastHit hit, bool cannotIntersect)
@@ -161,27 +174,11 @@ public class Ant : MonoBehaviour
         transform.position += speed * transform.forward * Time.deltaTime;
     }
 
-    //Move towards a specifik direction
-    void MoveInDirection(float xDir, float zDir)
-    {
-
-    }
-
-    // Get the direction with the highest pheromone concentration and move towards it
-    void FollowPheromone()
-    {
-        // Get the direction with the highest concentration
-        float[] direction;
-        direction = pheromoneManager.GetComponent<PheromoneManager>().GetDirectionHighestConcentration((int)Mathf.Round(transform.position.x), (int)Mathf.Round(transform.position.z));
-
-        // Move in that direction
-        MoveInDirection(direction[0], direction[1]);
-    }
-
     // Update is called once per frame
     protected virtual void Update()
     {
         See();
         Move();
+        
     }
 }

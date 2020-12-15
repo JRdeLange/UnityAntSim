@@ -8,6 +8,8 @@ using UnityEngine;
 
 public class PheromoneManager : MonoBehaviour
 {
+    public VizPlane vizPlanePrefab;
+    VizPlane vizPlane;
     public AvailabilityMap AM;
     public Floor floor;
     public PheromoneVizTile pheromoneVizTile;
@@ -30,7 +32,9 @@ public class PheromoneManager : MonoBehaviour
         mapSizeX = (int)Mathf.Round(floor.transform.lossyScale.x * 10f);
 
         pheromoneMap = new float[mapSizeX, mapSizeZ];
-        CreateTileMap(mapSizeX, mapSizeZ);
+
+        vizPlane = Instantiate(vizPlanePrefab, Vector3.zero, Quaternion.identity);
+        //CreateTileMap(mapSizeX, mapSizeZ);
         InvokeRepeating("SpreadAndEvaporatePheromones", 0f, scanTimeInterval);
     }
 
@@ -127,9 +131,9 @@ public class PheromoneManager : MonoBehaviour
 
         concentration = 0;
 
-        for (int x = xPos - 1; x < xPos + 1; x++)
+        for (int x = xPos - 1; x <= xPos + 1; x++)
         {
-            for (int z = zPos - 1; z < zPos + 1; z++)
+            for (int z = zPos - 1; z <= zPos + 1; z++)
             {
                 if (pheromoneMap[x, z] > concentration)
                 {
@@ -151,13 +155,17 @@ public class PheromoneManager : MonoBehaviour
             {
                 if (pheromoneMap[x, z] < pheromoneCap)
                 {
-                    tileMap[x, z].ChangeTransparancy(Mathf.Pow(pheromoneMap[x, z]/pheromoneCap, 1f/10f));
+
+                    vizPlane.ChangeTransparancy(x, z, Mathf.Pow(pheromoneMap[x, z]/pheromoneCap, 1f/20f));
+                    //tileMap[x, z].ChangeTransparancy(Mathf.Pow(pheromoneMap[x, z]/pheromoneCap, 1f/10f));
                 }else
                 {
-                    tileMap[x, z].ChangeTransparancy(1);
+                    vizPlane.ChangeTransparancy(x, z, 1);
+                    //tileMap[x, z].ChangeTransparancy(1);
                 }              
             }
         }
+        vizPlane.ApplyTextureChanges();
     }
 
     // Create a map and spawn all of the tiles for pheromone visibility
