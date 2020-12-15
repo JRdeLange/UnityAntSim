@@ -112,6 +112,11 @@ public class Worker : Ant
 
         GameObject gameObject = hit.collider.gameObject;
 
+        if (gameObject.tag == "Food")
+        {
+            //followingPheromones = true;
+        }
+
         if (! SpecialConditions(hit))
         {
             if (! (bool)functionMapping[gameObject.tag].DynamicInvoke(hit))

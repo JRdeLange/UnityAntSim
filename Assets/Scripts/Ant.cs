@@ -17,7 +17,7 @@ public class Ant : MonoBehaviour
 
     // Sense variables
     float coneWidth = 120;
-    float coneRadius = 4;
+    float coneRadius = 2;
     float smallestToBeSensedObjectWidth = 1;
     protected LayerMask getObjectsInVisionMask;
 
@@ -26,11 +26,15 @@ public class Ant : MonoBehaviour
     float ISAconeRadius = 2f;
     float ISAconeInterval = 30;
 
+    protected bool followingPheromones = false;
+    float pheromoneSpeed = 7;
+
     List<Collision> newCollisionsThisFrame = new List<Collision>();
 
     // Start is called before the first frame update
     protected virtual void Start()
     {
+        speed = 5f;
         pheromoneManager = GameObject.FindGameObjectWithTag("PheromoneManager").GetComponent<PheromoneManager>();
     }
 
@@ -60,6 +64,8 @@ public class Ant : MonoBehaviour
         float[] direction;
         direction = pheromoneManager.GetDirectionHighestConcentration((int)(transform.position.x), (int)(transform.position.z));
         Vector3 directionVector = new Vector3(direction[0], 0, direction[1]);
+
+        if (pheromoneManager.sensePheromone((int)(transform.position.x), (int)(transform.position.z))) followingPheromones = true;
 
         // Move in that direction
         float angle = AntSenseMethods.VectorToDirectionAngle(transform, directionVector);
@@ -171,7 +177,13 @@ public class Ant : MonoBehaviour
         if (stopped) return;
 
         Wiggle();
-        transform.position += speed * transform.forward * Time.deltaTime;
+        if (followingPheromones)
+        {
+            transform.position += pheromoneSpeed * transform.forward * Time.deltaTime;
+        } else
+        {
+            transform.position += speed * transform.forward * Time.deltaTime;
+        }
     }
 
     // Update is called once per frame
@@ -179,6 +191,6 @@ public class Ant : MonoBehaviour
     {
         See();
         Move();
-        
+        followingPheromones = false;
     }
 }

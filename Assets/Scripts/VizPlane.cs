@@ -21,7 +21,7 @@ public class VizPlane : MonoBehaviour
         sizeY = (int)Mathf.Round(floor.transform.lossyScale.z * 10f);
 
         texture = new Texture2D(sizeX, sizeY);
-        texture.filterMode = FilterMode.Point;
+        texture.filterMode = FilterMode.Bilinear;
         GetComponent<Renderer>().material.mainTexture = texture;
         for (int x = 0; x < sizeX; x++)
         {

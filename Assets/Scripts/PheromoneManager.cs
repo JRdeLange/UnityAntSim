@@ -27,6 +27,9 @@ public class PheromoneManager : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        evaporationFactor = .998f;
+        diffuseFactor = .07f;
+
         // Get the floor dimensions
         mapSizeZ = (int)Mathf.Round(floor.transform.lossyScale.z * 10f);
         mapSizeX = (int)Mathf.Round(floor.transform.lossyScale.x * 10f);

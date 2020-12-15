@@ -28,7 +28,7 @@ public class Food : MonoBehaviour
         mask = LayerMask.GetMask("Barrier", "Food");
         // Have a random starting offset to make it so that not all food grows at the same time.
         float startingOffset = Random.Range(invokeRepeatingInterval, 2 * invokeRepeatingInterval);
-        InvokeRepeating("SpawnFood", startingOffset, startingOffset);
+        InvokeRepeating("SpawnFood", startingOffset / 18f, startingOffset);
     }
 
     // Check if we even spawn food this iteration
