@@ -15,7 +15,7 @@ public class PheromoneManager : MonoBehaviour
     int mapSizeZ;
     float pheromoneCap = 100;
     float scanTimeInterval = 1f;
-    float senseThreshold = .01f;
+    float senseThreshold = .00001f;
     float evaporationFactor = .1f;
     float diffuseFactor = .1f;
     float [,] pheromoneMap;
@@ -60,7 +60,8 @@ public class PheromoneManager : MonoBehaviour
         {
             for (int z = zPos - 1; z <= zPos + 1; z++)
             {
-                if (z >= mapSizeZ || x >= mapSizeX || z < 0 || x < 0){}
+                if (z >= mapSizeZ || x >= mapSizeX || z < 0 || x < 0 || !AM.IsCellAvailable(x,z))
+                {}
                 else if (x == xPos && z == zPos)
                 {
                     pheromoneTransferMap[x, z] = pheromoneTransferMap[x, z] + concentration * (1f - ((8 * diffuseFactor) + evaporationFactor));
@@ -135,7 +136,7 @@ public class PheromoneManager : MonoBehaviour
             {
                 if (pheromoneMap[x, z] < pheromoneCap)
                 {
-                    tileMap[x, z].ChangeTransparancy(pheromoneMap[x, z]/pheromoneCap);
+                    tileMap[x, z].ChangeTransparancy(Mathf.Pow(pheromoneMap[x, z]/pheromoneCap, 1f/10f));
                 }else
                 {
                     tileMap[x, z].ChangeTransparancy(1);
