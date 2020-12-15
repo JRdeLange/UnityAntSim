@@ -14,10 +14,10 @@ public class PheromoneManager : MonoBehaviour
     int mapSizeX;
     int mapSizeZ;
     float pheromoneCap = 100;
-    float scanTimeInterval = 1f;
+    float scanTimeInterval = .1f;
     float senseThreshold = .00001f;
-    float evaporationFactor = .1f;
-    float diffuseFactor = .1f;
+    float evaporationFactor = .9f;
+    float diffuseFactor = .09f;
     float [,] pheromoneMap;
     float [,] pheromoneTransferMap;
     PheromoneVizTile [,] tileMap;
@@ -48,7 +48,18 @@ public class PheromoneManager : MonoBehaviour
                 }
             }
         }
-        pheromoneMap = pheromoneTransferMap;
+        print(pheromoneTransferMap[25,25]);
+        for (int xPos = 0; xPos < mapSizeX; xPos++)
+        {
+            for (int zPos = 0; zPos < mapSizeZ; zPos++)
+            {
+                pheromoneMap[xPos,zPos] += pheromoneTransferMap[xPos,zPos];
+                if (pheromoneMap[xPos,zPos]<senseThreshold)
+                {
+                    pheromoneMap[xPos,zPos] = 0;
+                }
+            }
+        }
         UpdateVisuals();
     }
 
@@ -64,10 +75,10 @@ public class PheromoneManager : MonoBehaviour
                 {}
                 else if (x == xPos && z == zPos)
                 {
-                    pheromoneTransferMap[x, z] = pheromoneTransferMap[x, z] + concentration * (1f - ((8 * diffuseFactor) + evaporationFactor));
+                    pheromoneTransferMap[x, z] -= concentration * evaporationFactor;
                 }else
                 {
-                    pheromoneTransferMap[x, z] = pheromoneMap[x, z] + concentration * diffuseFactor;
+                    pheromoneTransferMap[x, z] += concentration * diffuseFactor;
                 }          
             }
         }
