@@ -20,10 +20,4 @@ public class PheromoneVizTile : MonoBehaviour
         color.a = newTransparancy;
         tileMaterial.color = color;
     }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
 }

@@ -19,7 +19,7 @@ public class PheromoneManager : MonoBehaviour
     float evaporationFactor = .9f;
     float diffuseFactor = .09f;
     float [,] pheromoneMap;
-    float [,] pheromoneTransferMap;
+    float [,] pheromoneChangeMap;
     PheromoneVizTile [,] tileMap;
 
     // Start is called before the first frame update
@@ -37,7 +37,8 @@ public class PheromoneManager : MonoBehaviour
     // Goes over each square to check if it has pheromones, and diffuses and evaporates the pheromones at these locations
     void SpreadAndEvaporatePheromones()
     {
-        pheromoneTransferMap = new float[mapSizeX, mapSizeZ];
+        pheromoneChangeMap = new float[mapSizeX, mapSizeZ];
+        // Calculate the difference for each tile
         for (int xPos = 0; xPos < mapSizeX; xPos++)
         {
             for (int zPos = 0; zPos < mapSizeZ; zPos++)
@@ -48,12 +49,12 @@ public class PheromoneManager : MonoBehaviour
                 }
             }
         }
-        print(pheromoneTransferMap[25,25]);
+        // add/substract the difference to/from the tile
         for (int xPos = 0; xPos < mapSizeX; xPos++)
         {
             for (int zPos = 0; zPos < mapSizeZ; zPos++)
             {
-                pheromoneMap[xPos,zPos] += pheromoneTransferMap[xPos,zPos];
+                pheromoneMap[xPos,zPos] += pheromoneChangeMap[xPos,zPos];
                 if (pheromoneMap[xPos,zPos]<senseThreshold)
                 {
                     pheromoneMap[xPos,zPos] = 0;
@@ -75,10 +76,10 @@ public class PheromoneManager : MonoBehaviour
                 {}
                 else if (x == xPos && z == zPos)
                 {
-                    pheromoneTransferMap[x, z] -= concentration * evaporationFactor;
+                    pheromoneChangeMap[x, z] -= concentration * evaporationFactor;
                 }else
                 {
-                    pheromoneTransferMap[x, z] += concentration * diffuseFactor;
+                    pheromoneChangeMap[x, z] += concentration * diffuseFactor;
                 }          
             }
         }
@@ -100,7 +101,10 @@ public class PheromoneManager : MonoBehaviour
     // Drop pheromones at location [xPos, zPos]
     public void dropPheromone(int xPos, int zPos, float concentration)
     {
-        pheromoneMap[xPos, zPos] += concentration;
+        if (AM.IsCellAvailable(xPos,zPos))
+        {
+            pheromoneMap[xPos, zPos] += concentration;
+        }   
     }
 
     // Sense if there are pheromones at location [xPos, zPos]
