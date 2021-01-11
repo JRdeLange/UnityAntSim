@@ -6,36 +6,54 @@ public class Ant : MonoBehaviour
 {
 	// Add Pheromone Manager
 	protected PheromoneManager pheromoneManager;
+    protected SettingsManager settings;
 	
     // Movement variables
-    float speed = 5;
-    Vector3 direction = Vector3.forward;
-    float wiggleSpeed = 360;
-    float wiggleAngle = 20;
+    float speed;
+    float wiggleSpeed;
+    float wiggleAngle;
     protected float newMovementAngle;
     bool stopped = false;
 
     // Sense variables
-    float coneWidth = 120;
-    float coneRadius = 2;
-    float smallestToBeSensedObjectWidth = 1;
+    float coneWidth;
+    float coneRadius;
+    float smallestToBeSensedObjectWidth;
     protected LayerMask getObjectsInVisionMask;
 
     // Intelligent steer away variables
-    float ISAconeWidth = 360;
-    float ISAconeRadius = 2f;
-    float ISAconeInterval = 30;
+    float ISAconeWidth;
+    float ISAconeRadius;
+    float ISAconeInterval;
+    protected bool visualizeSight;
 
     protected bool followingPheromones = false;
-    float pheromoneSpeed = 7;
+    float pheromoneSpeed;
 
     List<Collision> newCollisionsThisFrame = new List<Collision>();
 
     // Start is called before the first frame update
     protected virtual void Start()
     {
-        speed = 5f;
         pheromoneManager = GameObject.FindGameObjectWithTag("PheromoneManager").GetComponent<PheromoneManager>();
+        settings = GameObject.FindGameObjectWithTag("SettingsManager").GetComponent<SettingsManager>();
+        Init();
+    }
+
+    void Init()
+    {
+        speed = settings.speed;
+        wiggleSpeed = settings.wiggleSpeed;
+        wiggleAngle = settings.wiggleAngle;
+        coneWidth = settings.coneWidth;
+        coneRadius = settings.coneRadius;
+        smallestToBeSensedObjectWidth = settings.smallestToBeSensedObjectWidth;
+        getObjectsInVisionMask = settings.getObjectsInVisionMask;
+        ISAconeWidth = settings.ISAconeWidth;
+        ISAconeRadius = settings.ISAconeRadius;
+        ISAconeInterval = settings.ISAconeInterval;
+        visualizeSight = settings.visualizeSight;
+        pheromoneSpeed = settings.pheromoneSpeed;
     }
 
     // Cast rays in order to find a clear direction
@@ -167,7 +185,7 @@ public class Ant : MonoBehaviour
         // List to put all of the objects in sight in
         List<RaycastHit> objectsInSightRays = AntSenseMethods.GetObjectsInVision(transform, transform.forward, coneWidth, 
                                                                              coneRadius, smallestToBeSensedObjectWidth, 
-                                                                             getObjectsInVisionMask);
+                                                                             getObjectsInVisionMask, visualizeSight);
         
         ParseSight(objectsInSightRays);
     }

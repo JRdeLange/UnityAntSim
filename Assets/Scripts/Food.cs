@@ -4,16 +4,18 @@ using UnityEngine;
 
 public class Food : MonoBehaviour
 {
-    float respawnChance = 1;
-    float invokeRepeatingInterval = 1;
+    float respawnChance;
+    float invokeRepeatingInterval;
     List<Vector3> directions = new List<Vector3>();
     List<float> rayLengths = new List<float>();
-
+    SettingsManager settings;
+    float offset1;
+    float offset2;
     
     float squareRootOfTwo = Mathf.Sqrt(2);
 
     // If false only spawn food in the 4 cardinal directions, otherwise all 8
-    bool spawnFoodAtAllEightDirs = true;
+    bool spawnFoodAtAllEightDirs;
 
     LayerMask mask;
 
@@ -22,13 +24,20 @@ public class Food : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        settings = GameObject.FindGameObjectWithTag("SettingsManager").GetComponent<SettingsManager>();
+        respawnChance = settings.respawnChance;
+        invokeRepeatingInterval = settings.invokeRepeatingInterval;
+        spawnFoodAtAllEightDirs = settings.spawnFoodAtAllEightDirs;
+        offset1 = settings.offset1;
+        offset2 = settings.offset2;
+
         // Generate 8 directions, multiply the corners by sqrt(2) because of pythagoras
         InitializeDirections();
 
         mask = LayerMask.GetMask("Barrier", "Food");
         // Have a random starting offset to make it so that not all food grows at the same time.
         float startingOffset = Random.Range(invokeRepeatingInterval, 2 * invokeRepeatingInterval);
-        InvokeRepeating("SpawnFood", startingOffset / 18f, startingOffset);
+        InvokeRepeating("SpawnFood", startingOffset * offset1, startingOffset * offset2);
     }
 
     // Check if we even spawn food this iteration

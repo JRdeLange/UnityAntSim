@@ -7,12 +7,16 @@ public class VizPlane : MonoBehaviour
 
     Texture2D texture;
     Floor floor;
+    Color color;
     int sizeX;
     int sizeY;
+    SettingsManager settings;
 
     // Start is called before the first frame update
     void Start()
     {
+        settings = GameObject.FindGameObjectWithTag("SettingsManager").GetComponent<SettingsManager>();
+        color = settings.color;
         floor = GameObject.FindGameObjectWithTag("Floor").GetComponent<Floor>();
         transform.localScale = new Vector3(floor.transform.lossyScale.x, 1, floor.transform.lossyScale.z);
         transform.position = floor.transform.position + new Vector3(0, 0.001f, 0);
@@ -27,7 +31,7 @@ public class VizPlane : MonoBehaviour
         {
             for (int y = 0; y < sizeY; y++)
             {
-                texture.SetPixel(x, y, new Color(1, 0, 0, 0));
+                texture.SetPixel(x, y, color);
             }
         }
         texture.Apply();

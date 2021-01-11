@@ -9,20 +9,20 @@ public class Worker : Ant
     List<string> avoid = new List<string>();
     List<string> cannotIntersect = new List<string>();
     List<string> flee = new List<string>();
-    //List<string[]> importanceOrder = new List<string[]>();
     Dictionary<string, int> importanceOrder = new Dictionary<string, int>();
     Dictionary<string, System.Func<RaycastHit, bool>> functionMapping = new Dictionary<string, System.Func<RaycastHit, bool>>();
-    float avoidThreshold = 1.5f;
-    float foodPickupThreshold = 1.0f;
-    int amountOfCarriedFood = 0;
-    float maxCarriedFood = Mathf.Infinity;
+    float avoidThreshold;
+    float foodPickupThreshold;
+    int amountOfCarriedFood;
+    float maxCarriedFood;
 
     // Start is called before the first frame update
     protected override void Start()
     {
         base.Start();
+        Init();
 
-        getObjectsInVisionMask = LayerMask.GetMask("Food", "Barrier", "Ant");
+        //getObjectsInVisionMask = LayerMask.GetMask("Food", "Barrier", "Ant");
 
         // Approach food
         approach.Add("Food");
@@ -49,6 +49,14 @@ public class Worker : Ant
         functionMapping.Add(this.tag, AvoidBehavior);
         functionMapping.Add("Food", ApproachBehavior);
 
+    }
+
+    void Init()
+    {
+        avoidThreshold = settings.avoidThreshold;
+        foodPickupThreshold = settings.foodPickupThreshold;
+        amountOfCarriedFood = settings.amountOfCarriedFood;
+        maxCarriedFood = settings.maxCarriedFood;
     }
 
     bool AvoidBehavior(RaycastHit hit)
@@ -108,9 +116,9 @@ public class Worker : Ant
         // Check if a thing has been found
         if (hit.distance == Mathf.Infinity) return;
 
-        //Debug.DrawLine(transform.position, hit.point, Color.red);
+        if (visualizeSight) Debug.DrawLine(transform.position, hit.point, Color.red);
 
-        GameObject gameObject = hit.collider.gameObject;
+        //GameObject gameObject = hit.collider.gameObject;
 
         if (gameObject.tag == "Food")
         {

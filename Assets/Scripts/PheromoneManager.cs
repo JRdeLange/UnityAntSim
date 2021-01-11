@@ -8,6 +8,7 @@ using UnityEngine;
 
 public class PheromoneManager : MonoBehaviour
 {
+    SettingsManager settings;
     public VizPlane vizPlanePrefab;
     VizPlane vizPlane;
     public AvailabilityMap AM;
@@ -15,11 +16,11 @@ public class PheromoneManager : MonoBehaviour
     public PheromoneVizTile pheromoneVizTile;
     int mapSizeX;
     int mapSizeZ;
-    float pheromoneCap = 100;
-    float scanTimeInterval = .1f;
-    float senseThreshold = .00001f;
-    float evaporationFactor = .9f;
-    float diffuseFactor = .09f;
+    float pheromoneCap;
+    float scanTimeInterval;
+    float senseThreshold;
+    float evaporationFactor;
+    float diffuseFactor;
     float [,] pheromoneMap;
     float [,] pheromoneChangeMap;
     PheromoneVizTile [,] tileMap;
@@ -27,6 +28,9 @@ public class PheromoneManager : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        settings = GameObject.FindGameObjectWithTag("SettingsManager").GetComponent<SettingsManager>();
+        Init();
+
         evaporationFactor = .998f;
         diffuseFactor = .07f;
 
@@ -39,6 +43,15 @@ public class PheromoneManager : MonoBehaviour
         vizPlane = Instantiate(vizPlanePrefab, Vector3.zero, Quaternion.identity);
         //CreateTileMap(mapSizeX, mapSizeZ);
         InvokeRepeating("SpreadAndEvaporatePheromones", 0f, scanTimeInterval);
+    }
+
+    void Init()
+    {
+        pheromoneCap = settings.pheromoneCap;
+        scanTimeInterval = settings.scanTimeInterval;
+        senseThreshold = settings.senseThreshold;
+        evaporationFactor = settings.evaporationFactor;
+        diffuseFactor = settings.diffuseFactor;
     }
 
     // Goes over each square to check if it has pheromones, and diffuses and evaporates the pheromones at these locations

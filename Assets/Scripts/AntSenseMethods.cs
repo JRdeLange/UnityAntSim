@@ -54,7 +54,7 @@ public class AntSenseMethods : MonoBehaviour
 
     public static List<RaycastHit> GetObjectsInVision(Transform antTransform, Vector3 antDirection, float coneWidth, 
                                                       float coneRadius, float smallestToBeSensedObjectWidth,
-                                                      LayerMask mask)
+                                                      LayerMask mask, bool visualizeSight)
     {
         float coneRayInterval = CalculateConeRayInterval(coneWidth, coneRadius, smallestToBeSensedObjectWidth);
         List<Vector3> rayDirections = AntSenseMethods.GenerateRayDirections(coneWidth, coneRayInterval);
@@ -70,7 +70,7 @@ public class AntSenseMethods : MonoBehaviour
             rotatedRay.Normalize();
 
             // Makes the lines visible for debug purposes
-            //Debug.DrawLine(antTransform.position, antTransform.position + (rotatedRay * coneRadius), Color.gray);
+            if (visualizeSight) Debug.DrawLine(antTransform.position, antTransform.position + (rotatedRay * coneRadius), Color.gray);
 
             // Get the objects in view by casting the rays
             //RaycastHit[] hits;
@@ -94,7 +94,7 @@ public class AntSenseMethods : MonoBehaviour
                     objectsInSightRays.Add(hit);
                     addedGameObjects.Add(hit.collider.gameObject);
                 }
-                //Debug.DrawLine(antTransform.position, hit.point);
+                if (visualizeSight) Debug.DrawLine(antTransform.position, hit.point);
             }
 
             // Debug printing
